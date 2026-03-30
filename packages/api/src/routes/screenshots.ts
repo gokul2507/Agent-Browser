@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { PageController, type ScreenshotOptions } from '@ai-browser/core';
+import { PageController, type ScreenshotOptions } from '@anthropic-ai-browser/core';
 
 interface ScreenshotQuery {
   fullPage?: string;

@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { PageController } from '@ai-browser/core';
+import { PageController } from '@anthropic-ai-browser/core';
 
 interface ClickBody {
   selector: string;

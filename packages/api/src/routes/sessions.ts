@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import type { EngineType } from '@ai-browser/core';
+import type { EngineType } from '@anthropic-ai-browser/core';
 
 interface CreateSessionBody {
   engine?: EngineType;

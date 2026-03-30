@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { PageController, type NavigateOptions } from '@ai-browser/core';
+import { PageController, type NavigateOptions } from '@anthropic-ai-browser/core';
 
 interface NavigateBody {
   url: string;

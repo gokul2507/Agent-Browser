@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { buildApp, type AppConfig } from './app.js';
 
 export { buildApp, type AppConfig };

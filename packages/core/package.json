@@ -1,8 +1,17 @@
 {
-  "name": "@ai-browser/core",
+  "name": "@anthropic-ai-browser/core",
   "version": "0.1.0",
-  "description": "Core browser engine for AI Browser — Lightpanda abstraction layer",
+  "description": "Core browser engine for AI Browser — dual engine (Lightpanda + Chromium) abstraction layer",
   "type": "module",
+  "license": "MIT",
+  "author": "gokul2507",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gokul2507/Agent-Browser.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/gokul2507/Agent-Browser#readme",
+  "keywords": ["ai", "browser", "headless", "lightpanda", "chromium", "puppeteer", "automation", "scraping", "mcp"],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -11,11 +20,16 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": ["dist", "README.md", "LICENSE"],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
     "dev": "tsup src/index.ts --format esm --dts --watch",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@lightpanda/browser": "^1.2.0",

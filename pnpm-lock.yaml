@@ -17,7 +17,7 @@ importers:
 
   packages/api:
     dependencies:
-      '@ai-browser/core':
+      '@anthropic-ai-browser/core':
         specifier: workspace:*
         version: link:../core
       '@fastify/cors':
@@ -61,10 +61,10 @@ importers:
 
   packages/mcp-server:
     dependencies:
-      '@ai-browser/api':
+      '@anthropic-ai-browser/api':
         specifier: workspace:*
         version: link:../api
-      '@ai-browser/core':
+      '@anthropic-ai-browser/core':
         specifier: workspace:*
         version: link:../core
       '@modelcontextprotocol/sdk':

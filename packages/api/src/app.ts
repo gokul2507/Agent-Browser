@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import Fastify, { type FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
-import { SessionManager, type BrowserConfig, type ChromiumConfig, type SessionManagerConfig } from '@ai-browser/core';
+import { SessionManager, type BrowserConfig, type ChromiumConfig, type SessionManagerConfig } from '@anthropic-ai-browser/core';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

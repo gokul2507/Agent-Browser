@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { SessionManager, EngineType } from '@ai-browser/core';
+import type { SessionManager, EngineType } from '@anthropic-ai-browser/core';
 
 export function registerSessionTools(
   server: McpServer,

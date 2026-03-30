@@ -172,7 +172,7 @@ curl -X DELETE http://localhost:3000/sessions/SESSION_ID
 ### JavaScript/TypeScript SDK
 
 ```bash
-npm install @ai-browser/sdk
+npm install @anthropic-ai-browser/sdk
 ```
 
 ```typescript

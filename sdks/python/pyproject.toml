@@ -1,13 +1,36 @@
 [project]
-name = "ai-browser"
+name = "ai-browser-sdk"
 version = "0.1.0"
 description = "Python SDK for AI Browser — interact with the web through AI-friendly APIs"
-readme = {text = "Python SDK for AI Browser", content-type = "text/plain"}
+readme = {text = "Python SDK for AI Browser. See https://github.com/gokul2507/Agent-Browser for full documentation.", content-type = "text/plain"}
+license = "MIT"
 requires-python = ">=3.10"
+authors = [
+    { name = "gokul2507", email = "gokul2507@users.noreply.github.com" },
+]
+keywords = ["ai", "browser", "headless", "automation", "scraping", "agent", "mcp"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "httpx>=0.27.0",
     "pydantic>=2.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/gokul2507/Agent-Browser"
+Repository = "https://github.com/gokul2507/Agent-Browser"
+Issues = "https://github.com/gokul2507/Agent-Browser/issues"
+Documentation = "https://github.com/gokul2507/Agent-Browser#python-sdk"
 
 [project.optional-dependencies]
 dev = [
