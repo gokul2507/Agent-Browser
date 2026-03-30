@@ -1,5 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SessionManager, type BrowserConfig, type SessionManagerConfig } from '@anthropic-ai-browser/core';
+import { SessionManager, type BrowserConfig, type SessionManagerConfig } from '@agent_browser/core';
 import { registerSessionTools } from './tools/sessions.js';
 import { registerNavigateTools } from './tools/navigate.js';
 import { registerContentTools } from './tools/content.js';

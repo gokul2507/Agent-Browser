@@ -9,7 +9,7 @@ import {
   loadCookiesFromFile,
   extractCookiesFromPage,
   injectCookiesIntoPage,
-} from '@anthropic-ai-browser/core';
+} from '@agent_browser/core';
 
 export async function cookieRoutes(app: FastifyInstance): Promise<void> {
   // Get cookies

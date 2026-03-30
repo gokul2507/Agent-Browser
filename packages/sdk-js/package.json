@@ -1,5 +1,5 @@
 {
-  "name": "@anthropic-ai-browser/sdk",
+  "name": "@agent_browser/sdk",
   "version": "0.1.0",
   "description": "JavaScript/TypeScript SDK for AI Browser — control a headless browser from your agent",
   "type": "module",

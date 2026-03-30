@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SessionManager, PageController } from '@anthropic-ai-browser/core';
+import { SessionManager, PageController } from '@agent_browser/core';
 
 export function registerNavigateTools(
   server: McpServer,

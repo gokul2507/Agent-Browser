@@ -1,6 +1,27 @@
 # AI Browser
 
+[![npm](https://img.shields.io/npm/v/@agent_browser/core)](https://www.npmjs.com/package/@agent_browser/core)
+[![PyPI](https://img.shields.io/pypi/v/ai-browser-sdk)](https://pypi.org/project/ai-browser-sdk/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub](https://img.shields.io/github/stars/gokul2507/Agent-Browser)](https://github.com/gokul2507/Agent-Browser)
+
 An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda-io/browser) and Chromium. Enables AI agents to navigate, extract, and interact with the web through **28 MCP tools**, a **REST API**, and **JS/Python SDKs**.
+
+## Installation
+
+```bash
+# MCP Server (Claude Code / Claude Desktop)
+npx @agent_browser/mcp-server
+
+# JavaScript/TypeScript SDK
+npm install @agent_browser/sdk
+
+# Python SDK
+pip install ai-browser-sdk-sdk
+
+# REST API Server
+npx @agent_browser/api
+```
 
 ```
                   Claude Code / Python agents / JS agents / curl
@@ -63,23 +84,28 @@ create_session({ engine: "auto" })
 
 ## Quick Start
 
-### Prerequisites
+### Option A: Use Published Packages (recommended)
 
-- Node.js >= 20
-- pnpm >= 9
-
-### Install
+No cloning needed. Just run:
 
 ```bash
-git clone https://github.com/your-org/ai-browser.git
-cd ai-browser
-pnpm install
+# Start MCP server (Claude Code integration)
+npx @agent_browser/mcp-server
+
+# Or start REST API server
+npx @agent_browser/api
+```
+
+### Option B: From Source
+
+```bash
+git clone https://github.com/gokul2507/Agent-Browser.git
+cd Agent-Browser
+pnpm install   # requires Node.js >= 20, pnpm >= 9
 pnpm build
 ```
 
 Lightpanda binary is downloaded to `~/.cache/lightpanda-node/lightpanda` and Chrome to `~/.cache/puppeteer/chrome/` during install.
-
-### Start the API server
 
 ```bash
 # Start with defaults (localhost:3000)
@@ -87,9 +113,6 @@ node packages/api/dist/index.js
 
 # Or with custom config
 API_PORT=3001 API_KEY=my-secret node packages/api/dist/index.js
-
-# Development mode (auto-reload)
-pnpm --filter @ai-browser/api dev
 ```
 
 ### Open the Dashboard
@@ -108,8 +131,21 @@ Add to your `.mcp.json` or Claude Desktop config:
 {
   "mcpServers": {
     "ai-browser": {
+      "command": "npx",
+      "args": ["@agent_browser/mcp-server"]
+    }
+  }
+}
+```
+
+Or if running from source:
+
+```json
+{
+  "mcpServers": {
+    "ai-browser": {
       "command": "node",
-      "args": ["/path/to/ai-browser/packages/mcp-server/dist/index.js"]
+      "args": ["/path/to/Agent-Browser/packages/mcp-server/dist/index.js"]
     }
   }
 }
@@ -172,7 +208,7 @@ curl -X DELETE http://localhost:3000/sessions/SESSION_ID
 ### JavaScript/TypeScript SDK
 
 ```bash
-npm install @anthropic-ai-browser/sdk
+npm install @agent_browser/sdk
 ```
 
 ```typescript
@@ -194,7 +230,7 @@ await session.destroy();
 ### Python SDK
 
 ```bash
-pip install ai-browser
+pip install ai-browser-sdk
 ```
 
 ```python
@@ -480,11 +516,11 @@ ai-browser/
 
 | Package | Description |
 |---------|-------------|
-| `@ai-browser/core` | Dual browser engine (Lightpanda + Chromium), session management, page control, content extraction, SPA actions, cookie utilities |
-| `@ai-browser/api` | REST API with 30+ endpoints, auth, rate limiting, logging, dashboard |
-| `@ai-browser/mcp-server` | MCP server with 28 tools + embedded dashboard for Claude Code |
-| `@ai-browser/sdk` | TypeScript SDK wrapping the REST API |
-| `ai-browser` (Python) | Python SDK with async support and Pydantic models |
+| [`@agent_browser/core`](https://www.npmjs.com/package/@agent_browser/core) | Dual browser engine (Lightpanda + Chromium), session management, page control, content extraction, SPA actions, cookie utilities |
+| [`@agent_browser/api`](https://www.npmjs.com/package/@agent_browser/api) | REST API with 30+ endpoints, auth, rate limiting, logging, dashboard |
+| [`@agent_browser/mcp-server`](https://www.npmjs.com/package/@agent_browser/mcp-server) | MCP server with 28 tools + embedded dashboard for Claude Code |
+| [`@agent_browser/sdk`](https://www.npmjs.com/package/@agent_browser/sdk) | TypeScript SDK wrapping the REST API |
+| [`ai-browser-sdk`](https://pypi.org/project/ai-browser-sdk/) | Python SDK with async support and Pydantic models |
 
 ## Examples
 
@@ -592,11 +628,9 @@ async with AIBrowser("http://localhost:3000") as browser:
 {
   "mcpServers": {
     "ai-browser": {
-      "command": "node",
-      "args": ["/path/to/ai-browser/packages/mcp-server/dist/index.js"],
+      "command": "npx",
+      "args": ["@agent_browser/mcp-server"],
       "env": {
-        "LIGHTPANDA_HOST": "127.0.0.1",
-        "LIGHTPANDA_PORT": "9222",
         "DASHBOARD_PORT": "3000"
       }
     }

@@ -10,7 +10,7 @@ import {
   extractCookiesFromPage,
   exportCookiesToJson,
   saveCookiesToFile,
-} from '@anthropic-ai-browser/core';
+} from '@agent_browser/core';
 
 export function registerCookieTools(
   server: McpServer,

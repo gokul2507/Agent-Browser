@@ -28,7 +28,7 @@ console.error('AI Browser MCP Server running on stdio');
 const dashboardPort = Number(process.env.DASHBOARD_PORT ?? 3000);
 setTimeout(async () => {
   try {
-    const { buildApp } = await import('@anthropic-ai-browser/api');
+    const { buildApp } = await import('@agent_browser/api');
     const app = await buildApp({
       sessionManager,
       logLevel: 'silent',

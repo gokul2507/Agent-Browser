@@ -1,5 +1,5 @@
 {
-  "name": "@anthropic-ai-browser/core",
+  "name": "@agent_browser/core",
   "version": "0.1.0",
   "description": "Core browser engine for AI Browser — dual engine (Lightpanda + Chromium) abstraction layer",
   "type": "module",

@@ -1,7 +1,7 @@
 {
-  "name": "@anthropic-ai-browser/mcp-server",
+  "name": "@agent_browser/mcp-server",
   "version": "0.1.0",
-  "description": "MCP Server for AI Browser — 28 tools for AI agents to browse the web via Claude Code",
+  "description": "MCP Server for AI Browser \u2014 28 tools for AI agents to browse the web via Claude Code",
   "type": "module",
   "license": "MIT",
   "author": "gokul2507",
@@ -11,13 +11,26 @@
     "directory": "packages/mcp-server"
   },
   "homepage": "https://github.com/gokul2507/Agent-Browser#readme",
-  "keywords": ["ai", "browser", "mcp", "model-context-protocol", "claude", "llm", "agent", "automation"],
+  "keywords": [
+    "ai",
+    "browser",
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "llm",
+    "agent",
+    "automation"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
     "ai-browser-mcp": "dist/index.js"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -28,8 +41,8 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@anthropic-ai-browser/api": "workspace:*",
-    "@anthropic-ai-browser/core": "workspace:*",
+    "@agent_browser/api": "workspace:*",
+    "@agent_browser/core": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "zod": "^3.24.0"
   },

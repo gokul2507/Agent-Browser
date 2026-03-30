@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { PageController } from '@anthropic-ai-browser/core';
+import { PageController } from '@agent_browser/core';
 
 export async function contentRoutes(app: FastifyInstance): Promise<void> {
   // Get full structured content
