@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ai-browser": {
+      "command": "npx",
+      "args": ["tsx", "/Users/gokul-17129/Projects/AI Browser/packages/mcp-server/src/index.ts"],
+      "env": {
+        "LIGHTPANDA_HOST": "127.0.0.1",
+        "LIGHTPANDA_PORT": "9222"
+      }
+    }
+  }
+}

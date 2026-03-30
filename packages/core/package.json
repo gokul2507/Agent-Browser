@@ -1,0 +1,30 @@
+{
+  "name": "@ai-browser/core",
+  "version": "0.1.0",
+  "description": "Core browser engine for AI Browser — Lightpanda abstraction layer",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@lightpanda/browser": "^1.2.0",
+    "puppeteer": "^24.40.0",
+    "puppeteer-core": "^24.0.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "vitest": "^3.0.0"
+  }
+}

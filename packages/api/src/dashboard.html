@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Browser — Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface-2: #1a1a26;
+      --border: #2a2a3a;
+      --text: #e0e0e8;
+      --text-dim: #888898;
+      --accent: #6c5ce7;
+      --accent-glow: #6c5ce740;
+      --green: #00d68f;
+      --red: #ff6b6b;
+      --orange: #ffa94d;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .status-dot.offline { background: var(--red); }
+
+    /* Layout */
+    .container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      height: calc(100vh - 61px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover { background: #5b4bd6; }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .btn-danger:hover { background: #ff6b6b20; }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .session-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .session-card {
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .session-card:hover { border-color: var(--accent); background: var(--surface-2); }
+    .session-card.active { border-color: var(--accent); background: var(--accent-glow); }
+
+    .session-id {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .session-url {
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .session-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--text-dim);
+      font-size: 14px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Main Panel */
+    .main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .url-input {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .url-input:focus { border-color: var(--accent); }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .panel-hidden { display: none; }
+
+    /* Content display */
+    .content-section {
+      margin-bottom: 20px;
+    }
+
+    .content-section h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .content-text {
+      font-size: 14px;
+      line-height: 1.6;
+      background: var(--surface-2);
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .links-list, .tables-list {
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .link-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .link-item:last-child { border-bottom: none; }
+
+    .link-text { color: var(--text); }
+    .link-href { color: var(--accent); font-size: 12px; max-width: 50%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Action log */
+    .log-entry {
+      display: flex;
+      gap: 12px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .log-time { color: var(--text-dim); white-space: nowrap; }
+    .log-action { color: var(--orange); font-weight: 600; min-width: 80px; }
+    .log-detail { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* JS Console */
+    .console-input {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .console-input input {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .console-input input:focus { border-color: var(--accent); }
+
+    .console-output {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .console-line {
+      padding: 4px 0;
+      border-bottom: 1px solid #ffffff08;
+    }
+
+    .console-line.input-line { color: var(--accent); }
+    .console-line.output-line { color: var(--green); }
+    .console-line.error-line { color: var(--red); }
+
+    /* Screenshot */
+    .screenshot-container {
+      text-align: center;
+    }
+
+    .screenshot-container img {
+      max-width: 100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .screenshot-actions {
+      margin-bottom: 12px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .no-session {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-dim);
+      font-size: 16px;
+    }
+
+    .no-session p { margin-top: 8px; font-size: 13px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-green { background: #00d68f20; color: var(--green); }
+    .badge-orange { background: #ffa94d20; color: var(--orange); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">B</div>
+    AI Browser Dashboard
+  </div>
+  <div class="status-bar">
+    <span><span class="status-dot" id="serverStatus"></span> <span id="serverStatusText">Checking...</span></span>
+    <span id="sessionCount">0 sessions</span>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>Sessions</h2>
+      <button class="btn btn-primary btn-sm" onclick="createSession()">+ New</button>
+    </div>
+    <div class="session-list" id="sessionList">
+      <div class="empty-state">
+        <p>No active sessions</p>
+        <p style="font-size: 12px; margin-top: 4px;">Click "+ New" to start browsing</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Panel -->
+  <div class="main" id="mainPanel">
+    <div class="no-session" id="noSessionView">
+      <div style="font-size: 48px; margin-bottom: 16px;">B</div>
+      <span>Select or create a session to begin</span>
+      <p>Create a session, navigate to a URL, and see live content extraction</p>
+    </div>
+
+    <div id="sessionView" style="display:none; flex:1; display:none; flex-direction:column;">
+      <!-- URL bar -->
+      <div class="toolbar">
+        <button class="btn btn-sm" onclick="goBack()" title="Back">&larr;</button>
+        <button class="btn btn-sm" onclick="goForward()" title="Forward">&rarr;</button>
+        <button class="btn btn-sm" onclick="reloadPage()" title="Reload">&#x21bb;</button>
+        <input class="url-input" id="urlInput" placeholder="Enter URL and press Enter..." onkeydown="if(event.key==='Enter')navigateTo()">
+        <button class="btn btn-primary btn-sm" onclick="navigateTo()">Go</button>
+        <button class="btn btn-danger" onclick="destroyCurrentSession()">End</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" data-tab="content" onclick="switchTab('content')">Content</div>
+        <div class="tab" data-tab="links" onclick="switchTab('links')">Links</div>
+        <div class="tab" data-tab="console" onclick="switchTab('console')">Console</div>
+        <div class="tab" data-tab="screenshot" onclick="switchTab('screenshot')">Screenshot</div>
+        <div class="tab" data-tab="log" onclick="switchTab('log')">Log</div>
+      </div>
+
+      <!-- Content Panel -->
+      <div class="panel" id="panel-content">
+        <div class="content-section">
+          <h3>Page Title</h3>
+          <div class="content-text" id="pageTitle" style="padding:10px; max-height:none;">—</div>
+        </div>
+        <div class="content-section">
+          <h3>Extracted Text</h3>
+          <div class="content-text" id="pageText">Navigate to a page to see content</div>
+        </div>
+        <div class="content-section">
+          <h3>Metadata</h3>
+          <div class="content-text" id="pageMeta" style="max-height:none;">—</div>
+        </div>
+      </div>
+
+      <!-- Links Panel -->
+      <div class="panel panel-hidden" id="panel-links">
+        <div class="content-section">
+          <h3>Page Links <span class="badge badge-green" id="linkCount">0</span></h3>
+          <div class="links-list" id="linksList"></div>
+        </div>
+      </div>
+
+      <!-- Console Panel -->
+      <div class="panel panel-hidden" id="panel-console">
+        <div class="console-input">
+          <input id="jsInput" placeholder="() => document.title" onkeydown="if(event.key==='Enter')executeJs()">
+          <button class="btn btn-primary btn-sm" onclick="executeJs()">Run</button>
+        </div>
+        <div class="console-output" id="consoleOutput"></div>
+      </div>
+
+      <!-- Screenshot Panel -->
+      <div class="panel panel-hidden" id="panel-screenshot">
+        <div class="screenshot-actions">
+          <button class="btn btn-primary btn-sm" onclick="takeScreenshot(false)">Viewport</button>
+          <button class="btn btn-sm" onclick="takeScreenshot(true)">Full Page</button>
+        </div>
+        <div class="screenshot-container" id="screenshotContainer">
+          <p style="color: var(--text-dim);">Click a button to capture</p>
+        </div>
+      </div>
+
+      <!-- Log Panel -->
+      <div class="panel panel-hidden" id="panel-log">
+        <div id="actionLog"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = window.location.origin;
+  let currentSessionId = null;
+  let actionLogs = [];
+
+  // ── API Helpers ──
+
+  async function api(method, path, body) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API + path, opts);
+    if (res.status === 204) return null;
+    return res.json();
+  }
+
+  function addLog(action, detail) {
+    const time = new Date().toLocaleTimeString();
+    actionLogs.unshift({ time, action, detail });
+    if (actionLogs.length > 100) actionLogs.pop();
+    renderLog();
+  }
+
+  // ── Health Check ──
+
+  async function checkHealth() {
+    try {
+      const data = await api('GET', '/health');
+      const dot = document.getElementById('serverStatus');
+      const txt = document.getElementById('serverStatusText');
+      if (data?.status === 'ok') {
+        dot.className = 'status-dot online';
+        txt.textContent = 'Connected';
+      } else {
+        dot.className = 'status-dot offline';
+        txt.textContent = 'Error';
+      }
+    } catch {
+      document.getElementById('serverStatus').className = 'status-dot offline';
+      document.getElementById('serverStatusText').textContent = 'Disconnected';
+    }
+  }
+
+  // ── Sessions ──
+
+  async function refreshSessions() {
+    try {
+      const data = await api('GET', '/sessions');
+      const sessions = data.sessions || [];
+      document.getElementById('sessionCount').textContent = sessions.length + ' session' + (sessions.length !== 1 ? 's' : '');
+      renderSessionList(sessions);
+    } catch {}
+  }
+
+  function renderSessionList(sessions) {
+    const list = document.getElementById('sessionList');
+    if (sessions.length === 0) {
+      list.innerHTML = '<div class="empty-state"><p>No active sessions</p><p style="font-size:12px;margin-top:4px;">Click "+ New" to start browsing</p></div>';
+      return;
+    }
+    list.innerHTML = sessions.map(s => `
+      <div class="session-card ${s.id === currentSessionId ? 'active' : ''}" onclick="selectSession('${s.id}')">
+        <div class="session-id">${s.id.substring(0, 8)}...</div>
+        <div class="session-url">${s.currentUrl || 'No page loaded'}</div>
+        <div class="session-meta">
+          <span>${new Date(s.createdAt).toLocaleTimeString()}</span>
+          <span class="badge ${s.currentUrl ? 'badge-green' : 'badge-orange'}">${s.currentUrl ? 'Active' : 'Idle'}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function createSession() {
+    const data = await api('POST', '/sessions', {});
+    currentSessionId = data.session.id;
+    addLog('CREATE', 'Session ' + currentSessionId.substring(0, 8));
+    showSessionView();
+    refreshSessions();
+  }
+
+  function selectSession(id) {
+    currentSessionId = id;
+    showSessionView();
+    refreshSessions();
+    loadContent();
+  }
+
+  async function destroyCurrentSession() {
+    if (!currentSessionId) return;
+    await api('DELETE', '/sessions/' + currentSessionId);
+    addLog('DESTROY', 'Session ' + currentSessionId.substring(0, 8));
+    currentSessionId = null;
+    hideSessionView();
+    refreshSessions();
+  }
+
+  function showSessionView() {
+    document.getElementById('noSessionView').style.display = 'none';
+    const sv = document.getElementById('sessionView');
+    sv.style.display = 'flex';
+    sv.style.flexDirection = 'column';
+    sv.style.flex = '1';
+  }
+
+  function hideSessionView() {
+    document.getElementById('noSessionView').style.display = 'flex';
+    document.getElementById('sessionView').style.display = 'none';
+  }
+
+  // ── Navigation ──
+
+  async function navigateTo() {
+    if (!currentSessionId) return;
+    let url = document.getElementById('urlInput').value.trim();
+    if (!url) return;
+    if (!url.startsWith('http')) url = 'https://' + url;
+
+    addLog('NAVIGATE', url);
+    const data = await api('POST', '/sessions/' + currentSessionId + '/navigate', { url });
+    if (data?.result) {
+      document.getElementById('urlInput').value = data.result.url;
+      addLog('LOADED', data.result.title + ' (' + data.result.loadTimeMs + 'ms)');
+    }
+    loadContent();
+    refreshSessions();
+  }
+
+  async function goBack() {
+    if (!currentSessionId) return;
+    await api('POST', '/sessions/' + currentSessionId + '/back', {});
+    addLog('BACK', '');
+    loadContent();
+  }
+
+  async function goForward() {
+    if (!currentSessionId) return;
+    await api('POST', '/sessions/' + currentSessionId + '/forward', {});
+    addLog('FORWARD', '');
+    loadContent();
+  }
+
+  async function reloadPage() {
+    if (!currentSessionId) return;
+    await api('POST', '/sessions/' + currentSessionId + '/reload', {});
+    addLog('RELOAD', '');
+    loadContent();
+  }
+
+  // ── Content ──
+
+  async function loadContent() {
+    if (!currentSessionId) return;
+    try {
+      const data = await api('GET', '/sessions/' + currentSessionId + '/content');
+      const c = data.content;
+      document.getElementById('pageTitle').textContent = c.title || '—';
+      document.getElementById('pageText').textContent = c.text || 'No text content';
+      document.getElementById('urlInput').value = c.url || '';
+
+      const meta = Object.entries(c.metadata || {}).filter(([,v]) => v).map(([k,v]) => k + ': ' + v).join('\n');
+      document.getElementById('pageMeta').textContent = meta || 'No metadata';
+
+      // Links
+      const links = c.links || [];
+      document.getElementById('linkCount').textContent = links.length;
+      document.getElementById('linksList').innerHTML = links.slice(0, 100).map(l => `
+        <div class="link-item">
+          <span class="link-text">${escHtml(l.text || '(no text)')}</span>
+          <span class="link-href" title="${escHtml(l.href)}">${escHtml(l.href)}</span>
+        </div>
+      `).join('') || '<div style="padding:14px;color:var(--text-dim)">No links found</div>';
+    } catch {}
+  }
+
+  // ── JavaScript Console ──
+
+  async function executeJs() {
+    if (!currentSessionId) return;
+    const expr = document.getElementById('jsInput').value.trim();
+    if (!expr) return;
+
+    const output = document.getElementById('consoleOutput');
+    output.innerHTML += `<div class="console-line input-line">&gt; ${escHtml(expr)}</div>`;
+
+    const data = await api('POST', '/sessions/' + currentSessionId + '/execute', { expression: expr });
+    const r = data?.result;
+    if (r?.error) {
+      output.innerHTML += `<div class="console-line error-line">${escHtml(r.error)}</div>`;
+    } else {
+      const text = typeof r?.result === 'string' ? r.result : JSON.stringify(r?.result, null, 2);
+      output.innerHTML += `<div class="console-line output-line">${escHtml(text)}</div>`;
+    }
+
+    addLog('EXEC_JS', expr);
+    output.scrollTop = output.scrollHeight;
+    document.getElementById('jsInput').value = '';
+  }
+
+  // ── Screenshot ──
+
+  async function takeScreenshot(fullPage) {
+    if (!currentSessionId) return;
+    const qs = fullPage ? '?fullPage=true' : '';
+    const data = await api('GET', '/sessions/' + currentSessionId + '/screenshot' + qs);
+    const ss = data?.screenshot;
+    if (ss?.data) {
+      document.getElementById('screenshotContainer').innerHTML =
+        `<img src="data:${ss.mimeType};base64,${ss.data}" alt="Screenshot">`;
+      addLog('SCREENSHOT', fullPage ? 'Full page' : 'Viewport');
+    }
+  }
+
+  // ── Tabs ──
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    document.querySelectorAll('.panel').forEach(p => {
+      p.classList.toggle('panel-hidden', p.id !== 'panel-' + name);
+    });
+  }
+
+  // ── Log ──
+
+  function renderLog() {
+    document.getElementById('actionLog').innerHTML = actionLogs.map(l => `
+      <div class="log-entry">
+        <span class="log-time">${l.time}</span>
+        <span class="log-action">${l.action}</span>
+        <span class="log-detail">${escHtml(l.detail)}</span>
+      </div>
+    `).join('') || '<div style="padding:14px;color:var(--text-dim)">No actions yet</div>';
+  }
+
+  // ── Utils ──
+
+  function escHtml(s) {
+    if (!s) return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Init ──
+
+  checkHealth();
+  refreshSessions();
+  renderLog();
+  setInterval(checkHealth, 5000);
+  setInterval(refreshSessions, 3000);
+</script>
+
+</body>
+</html>

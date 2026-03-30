@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Browser — Cookie Exporter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e8; padding: 40px; max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    .subtitle { color: #888; margin-bottom: 32px; }
+    .step { background: #12121a; border: 1px solid #2a2a3a; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .step h2 { font-size: 16px; color: #6c5ce7; margin-bottom: 12px; }
+    .step p { font-size: 14px; line-height: 1.6; color: #ccc; margin-bottom: 12px; }
+    code { background: #1a1a26; padding: 2px 8px; border-radius: 4px; font-size: 13px; color: #ffa94d; }
+    pre { background: #1a1a26; border: 1px solid #2a2a3a; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 12px 0; color: #e0e0e8; }
+    .bookmarklet { display: inline-block; padding: 12px 24px; background: #6c5ce7; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; cursor: grab; margin: 8px 0; }
+    .bookmarklet:hover { background: #5b4bd6; }
+    textarea { width: 100%; height: 200px; background: #1a1a26; border: 1px solid #2a2a3a; border-radius: 8px; padding: 16px; color: #e0e0e8; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; resize: vertical; }
+    .btn { padding: 10px 20px; background: #6c5ce7; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-right: 8px; }
+    .btn:hover { background: #5b4bd6; }
+    .btn-outline { background: transparent; border: 1px solid #6c5ce7; color: #6c5ce7; }
+    .note { background: #1a1a26; border-left: 3px solid #ffa94d; padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 13px; color: #ccc; margin: 16px 0; }
+  </style>
+</head>
+<body>
+
+<h1>Cookie Exporter</h1>
+<p class="subtitle">Export cookies from your browser to use with AI Browser — no password sharing needed.</p>
+
+<!-- Step 1: DevTools method -->
+<div class="step">
+  <h2>Method 1: Browser DevTools (Recommended)</h2>
+  <p>1. Log in to the website you want the agent to access</p>
+  <p>2. Open DevTools (<code>F12</code> or <code>Cmd+Option+I</code>)</p>
+  <p>3. Go to the <code>Console</code> tab</p>
+  <p>4. Paste this script and press Enter:</p>
+  <pre id="devtoolsScript">(() => {
+  const cookies = document.cookie.split(';').map(c => {
+    const [name, ...rest] = c.trim().split('=');
+    return {
+      name: name,
+      value: rest.join('='),
+      domain: window.location.hostname,
+      path: '/',
+      secure: window.location.protocol === 'https:',
+    };
+  });
+  const json = JSON.stringify({ cookies, domain: window.location.hostname, exportedAt: new Date().toISOString() }, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cookies-${window.location.hostname}.json`;
+  a.click();
+  console.log(`Exported ${cookies.length} cookies for ${window.location.hostname}`);
+})();</pre>
+  <p>5. A JSON file will download. Use it with AI Browser:</p>
+  <pre>curl -X POST http://localhost:3000/sessions/SESSION_ID/cookies/import-file \
+  -H 'Content-Type: application/json' \
+  -d '{"filePath":"/path/to/cookies-example.com.json"}'</pre>
+</div>
+
+<!-- Step 2: EditThisCookie extension -->
+<div class="step">
+  <h2>Method 2: EditThisCookie Extension</h2>
+  <p>1. Install the <a href="https://chrome.google.com/webstore/detail/editthiscookie" style="color:#6c5ce7">EditThisCookie</a> browser extension</p>
+  <p>2. Log in to the target website</p>
+  <p>3. Click the EditThisCookie icon and choose <code>Export</code></p>
+  <p>4. Save the exported JSON to a file</p>
+  <p>5. Import into AI Browser — the format is auto-detected</p>
+</div>
+
+<!-- Step 3: Manual paste -->
+<div class="step">
+  <h2>Method 3: Paste Cookies Manually</h2>
+  <p>Paste cookie JSON below and click "Download" to save as a file:</p>
+  <textarea id="cookieInput" placeholder='[
+  { "name": "session", "value": "abc123", "domain": "example.com" },
+  { "name": "auth_token", "value": "xyz789", "domain": "example.com" }
+]'></textarea>
+  <div style="margin-top: 12px;">
+    <button class="btn" onclick="downloadCookies()">Download as JSON</button>
+    <button class="btn btn-outline" onclick="copyForCurl()">Copy as curl command</button>
+  </div>
+</div>
+
+<!-- Using with AI Browser -->
+<div class="step">
+  <h2>Using Exported Cookies with AI Browser</h2>
+
+  <p><strong>Via MCP (Claude Code):</strong></p>
+  <pre>Use the import_cookies_from_file tool with the session ID and cookie file path.</pre>
+
+  <p><strong>Via REST API:</strong></p>
+  <pre># From a file
+curl -X POST http://localhost:3000/sessions/SESSION_ID/cookies/import-file \
+  -H 'Content-Type: application/json' \
+  -d '{"filePath":"/Users/you/cookies-github.com.json"}'
+
+# From raw JSON
+curl -X POST http://localhost:3000/sessions/SESSION_ID/cookies/import \
+  -H 'Content-Type: application/json' \
+  -d '{"data":"[{\"name\":\"session\",\"value\":\"abc123\",\"domain\":\"github.com\"}]"}'</pre>
+
+  <p><strong>Via JS SDK:</strong></p>
+  <pre>import { AIBrowser } from '@ai-browser/sdk';
+
+const session = await browser.createSession();
+await session.setCookies([
+  { name: 'session', value: 'abc123', domain: 'github.com' },
+]);
+await session.navigate('https://github.com/dashboard');</pre>
+
+  <p><strong>Via Python SDK:</strong></p>
+  <pre>from ai_browser import AIBrowser, CookieParam
+
+session = await browser.create_session()
+await session.set_cookies([
+    CookieParam(name="session", value="abc123", domain="github.com"),
+])
+await session.navigate("https://github.com/dashboard")</pre>
+</div>
+
+<div class="note">
+  <strong>Security note:</strong> Cookie files contain your session tokens. Treat them like passwords. Never commit them to git. Add <code>*.cookies.json</code> to your <code>.gitignore</code>.
+</div>
+
+<script>
+  function downloadCookies() {
+    const input = document.getElementById('cookieInput').value.trim();
+    if (!input) return alert('Paste cookie data first');
+    try {
+      JSON.parse(input);
+    } catch {
+      return alert('Invalid JSON. Please check the format.');
+    }
+    const blob = new Blob([input], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'cookies.json';
+    a.click();
+  }
+
+  function copyForCurl() {
+    const input = document.getElementById('cookieInput').value.trim();
+    if (!input) return alert('Paste cookie data first');
+    const escaped = input.replace(/"/g, '\\"');
+    const cmd = `curl -X POST http://localhost:3000/sessions/SESSION_ID/cookies/import \\
+  -H 'Content-Type: application/json' \\
+  -d '{"data":"${escaped}"}'`;
+    navigator.clipboard.writeText(cmd);
+    alert('Copied curl command to clipboard!');
+  }
+</script>
+
+</body>
+</html>

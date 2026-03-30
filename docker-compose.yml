@@ -1,0 +1,30 @@
+services:
+  lightpanda:
+    image: lightpandaio/browser:latest
+    command: ["serve", "--host", "0.0.0.0", "--port", "9222", "--cdp-max-connections", "32"]
+    ports:
+      - "9222:9222"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "echo > /dev/tcp/127.0.0.1/9222 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=3000
+      - LIGHTPANDA_HOST=lightpanda
+      - LIGHTPANDA_PORT=9222
+      - API_KEY=${API_KEY:-}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-60000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      lightpanda:
+        condition: service_healthy
+    restart: unless-stopped
