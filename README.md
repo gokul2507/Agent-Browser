@@ -1,6 +1,6 @@
 # AI Browser
 
-[![npm](https://img.shields.io/npm/v/@agent_browser/core)](https://www.npmjs.com/package/@agent_browser/core)
+[![npm](https://img.shields.io/npm/v/@agent_browser/core?label=npm)](https://www.npmjs.com/package/@agent_browser/core)
 [![PyPI](https://img.shields.io/pypi/v/ai-browser-sdk)](https://pypi.org/project/ai-browser-sdk/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/github/stars/gokul2507/Agent-Browser)](https://github.com/gokul2507/Agent-Browser)

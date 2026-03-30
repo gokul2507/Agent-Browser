@@ -1,7 +1,7 @@
 {
   "name": "@agent_browser/sdk",
-  "version": "0.1.0",
-  "description": "JavaScript/TypeScript SDK for AI Browser — control a headless browser from your agent",
+  "version": "0.1.1",
+  "description": "JavaScript/TypeScript SDK for AI Browser \u2014 control a headless browser from your agent",
   "type": "module",
   "license": "MIT",
   "author": "gokul2507",
@@ -11,7 +11,15 @@
     "directory": "packages/sdk-js"
   },
   "homepage": "https://github.com/gokul2507/Agent-Browser#readme",
-  "keywords": ["ai", "browser", "sdk", "headless", "automation", "scraping", "agent"],
+  "keywords": [
+    "ai",
+    "browser",
+    "sdk",
+    "headless",
+    "automation",
+    "scraping",
+    "agent"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -20,7 +28,11 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "publishConfig": {
     "access": "public"
   },

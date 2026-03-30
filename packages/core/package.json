@@ -1,7 +1,7 @@
 {
   "name": "@agent_browser/core",
-  "version": "0.1.0",
-  "description": "Core browser engine for AI Browser — dual engine (Lightpanda + Chromium) abstraction layer",
+  "version": "0.1.1",
+  "description": "Core browser engine for AI Browser \u2014 dual engine (Lightpanda + Chromium) abstraction layer",
   "type": "module",
   "license": "MIT",
   "author": "gokul2507",
@@ -11,7 +11,17 @@
     "directory": "packages/core"
   },
   "homepage": "https://github.com/gokul2507/Agent-Browser#readme",
-  "keywords": ["ai", "browser", "headless", "lightpanda", "chromium", "puppeteer", "automation", "scraping", "mcp"],
+  "keywords": [
+    "ai",
+    "browser",
+    "headless",
+    "lightpanda",
+    "chromium",
+    "puppeteer",
+    "automation",
+    "scraping",
+    "mcp"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -20,7 +30,11 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "publishConfig": {
     "access": "public"
   },
