@@ -8,6 +8,7 @@ import { registerJavascriptTools } from './tools/javascript.js';
 import { registerScreenshotTools } from './tools/screenshots.js';
 import { registerCookieTools } from './tools/cookies.js';
 import { registerSpaTools } from './tools/spa.js';
+import { registerAdvancedTools } from './tools/advanced.js';
 
 export interface McpBrowserConfig {
   browser?: Partial<BrowserConfig>;
@@ -20,7 +21,7 @@ export function createServer(config: McpBrowserConfig = {}): {
 } {
   const server = new McpServer({
     name: 'ai-browser',
-    version: '0.1.3',
+    version: '0.2.0',
   });
 
   const sessionManager = new SessionManager(config.browser, config.session);
@@ -34,6 +35,7 @@ export function createServer(config: McpBrowserConfig = {}): {
   registerScreenshotTools(server, sessionManager);
   registerCookieTools(server, sessionManager);
   registerSpaTools(server, sessionManager);
+  registerAdvancedTools(server, sessionManager);
 
   return { server, sessionManager };
 }

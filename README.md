@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/github/stars/gokul2507/Agent-Browser)](https://github.com/gokul2507/Agent-Browser)
 
-An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda-io/browser) and Chromium. Enables AI agents to navigate, extract, and interact with the web through **28 MCP tools**, a **REST API**, and **JS/Python SDKs**.
+An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda-io/browser) and Chromium. Enables AI agents to navigate, extract, and interact with the web through **42 MCP tools**, a **REST API**, and **JS/Python SDKs**.
 
 ## Installation
 
@@ -357,8 +357,25 @@ Supported formats: JSON (EditThisCookie, DevTools), Netscape cookie.txt (curl, w
 | `POST` | `/sessions/:id/cookies/import` | Import cookies from JSON/Netscape string |
 | `POST` | `/sessions/:id/cookies/import-file` | Import cookies from local file |
 | `GET` | `/sessions/:id/cookies/export` | Export cookies (JSON or Netscape format) |
+| **Advanced** | | |
+| `POST` | `/sessions/:id/hover` | Hover over element |
+| `POST` | `/sessions/:id/viewport` | Set viewport size (width, height, mobile, retina) |
+| `GET` | `/sessions/:id/viewport` | Get current viewport |
+| `POST` | `/sessions/:id/console/start` | Start console message capture |
+| `GET` | `/sessions/:id/console` | Get captured console messages |
+| `POST` | `/sessions/:id/network/start` | Start network request capture |
+| `GET` | `/sessions/:id/network` | Get captured network requests with filtering |
+| `POST` | `/sessions/:id/dialogs/setup` | Configure dialog auto-handling |
+| `GET` | `/sessions/:id/dialogs` | Get dialog history |
+| `POST` | `/sessions/:id/upload` | Upload files to file input |
+| `GET` | `/sessions/:id/accessibility` | Get accessibility tree snapshot |
+| **Tabs** | | |
+| `GET` | `/sessions/:id/tabs` | List open tabs |
+| `POST` | `/sessions/:id/tabs/switch` | Switch to tab |
+| `POST` | `/sessions/:id/tabs/new` | Open new tab |
+| `DELETE` | `/sessions/:id/tabs/:tabIndex` | Close tab |
 
-### MCP Tools (28 tools)
+### MCP Tools (42 tools)
 
 | Tool | Description |
 |------|-------------|
@@ -401,6 +418,23 @@ Supported formats: JSON (EditThisCookie, DevTools), Netscape cookie.txt (curl, w
 | `export_cookies` | Export cookies (optionally save to file) |
 | `get_cookies` | Get all cookies for current page |
 | `clear_cookies` | Clear all cookies |
+| **Advanced** | |
+| `hover` | Hover over element (triggers tooltips, dropdowns) |
+| `resize_viewport` | Resize viewport (mobile, tablet, desktop, retina) |
+| `get_viewport` | Get current viewport dimensions |
+| `start_console_capture` | Start capturing browser console messages |
+| `get_console_messages` | Retrieve captured console messages with level filtering |
+| `start_network_capture` | Start capturing all network requests |
+| `get_network_requests` | Inspect captured network traffic with filtering (URL, method, status, type) |
+| `setup_dialog_handler` | Configure auto-accept/dismiss for alert/confirm/prompt dialogs |
+| `get_dialogs` | Get history of all dialogs that appeared |
+| `upload_file` | Upload files to `<input type="file">` elements |
+| `get_accessibility_snapshot` | Get accessibility tree (roles, names, values, states) |
+| **Tab Management** | |
+| `list_tabs` | List all open browser tabs |
+| `switch_tab` | Switch to a tab by index |
+| `open_new_tab` | Open new tab, optionally navigate to URL |
+| `close_tab` | Close a tab by index |
 
 ### Structured Output Format
 
@@ -518,7 +552,7 @@ ai-browser/
 ├── packages/
 │   ├── core/                 # Dual engine (Lightpanda + Chromium), SessionManager, PageController
 │   ├── api/                  # REST API server (Fastify) + Dashboard
-│   ├── mcp-server/           # MCP server for Claude Code (28 tools) + embedded dashboard
+│   ├── mcp-server/           # MCP server for Claude Code (42 tools) + embedded dashboard
 │   └── sdk-js/               # TypeScript SDK
 ├── sdks/
 │   └── python/               # Python SDK (httpx + pydantic)
@@ -541,8 +575,8 @@ ai-browser/
 | Package | Description |
 |---------|-------------|
 | [`@agent_browser/core`](https://www.npmjs.com/package/@agent_browser/core) | Dual browser engine (Lightpanda + Chromium), session management, page control, content extraction, SPA actions, cookie utilities |
-| [`@agent_browser/api`](https://www.npmjs.com/package/@agent_browser/api) | REST API with 30+ endpoints, auth, rate limiting, logging, dashboard |
-| [`@agent_browser/mcp-server`](https://www.npmjs.com/package/@agent_browser/mcp-server) | MCP server with 28 tools + embedded dashboard for Claude Code |
+| [`@agent_browser/api`](https://www.npmjs.com/package/@agent_browser/api) | REST API with 45+ endpoints, auth, rate limiting, logging, dashboard |
+| [`@agent_browser/mcp-server`](https://www.npmjs.com/package/@agent_browser/mcp-server) | MCP server with 42 tools + embedded dashboard for Claude Code |
 | [`@agent_browser/sdk`](https://www.npmjs.com/package/@agent_browser/sdk) | TypeScript SDK wrapping the REST API |
 | [`ai-browser-sdk`](https://pypi.org/project/ai-browser-sdk/) | Python SDK with async support and Pydantic models |
 

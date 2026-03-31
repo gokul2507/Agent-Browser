@@ -32,6 +32,22 @@ export {
   scrollToText,
 } from './actions.js';
 
+// Advanced functions
+export {
+  hover,
+  setViewport,
+  getViewport,
+  startConsoleCapture,
+  startNetworkCapture,
+  setupDialogHandler,
+  uploadFile,
+  getAccessibilitySnapshot,
+  listTabs,
+  switchTab,
+  openNewTab,
+  closeTab,
+} from './advanced.js';
+
 // Types
 export type {
   BrowserConfig,
@@ -61,6 +77,14 @@ export type {
   Cookie,
   InteractiveElement,
   ClickByTextResult,
+  ConsoleMessage,
+  NetworkRequest,
+  NetworkFilter,
+  DialogInfo,
+  ViewportSize,
+  AccessibilityNode,
+  TabInfo,
+  FileUploadOptions,
 } from './types.js';
 
 // Cookie utilities

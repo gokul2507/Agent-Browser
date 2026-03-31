@@ -222,3 +222,90 @@ export interface ClickByTextResult {
   selector: string;
   rect: { x: number; y: number; width: number; height: number };
 }
+
+// ── Console Messages ──
+
+export interface ConsoleMessage {
+  type: 'log' | 'info' | 'warn' | 'error' | 'debug' | 'trace';
+  text: string;
+  timestamp: number;
+  url?: string;
+  lineNumber?: number;
+}
+
+// ── Network Requests ──
+
+export interface NetworkRequest {
+  url: string;
+  method: string;
+  resourceType: string;
+  status: number | null;
+  statusText: string;
+  requestHeaders: Record<string, string>;
+  responseHeaders: Record<string, string>;
+  requestBody?: string;
+  responseSize: number | null;
+  timing: number | null;
+  failed: boolean;
+  failureText?: string;
+}
+
+export interface NetworkFilter {
+  urlPattern?: string;
+  resourceType?: string;
+  method?: string;
+  statusCode?: number;
+  failed?: boolean;
+  excludeStatic?: boolean;
+}
+
+// ── Dialog ──
+
+export interface DialogInfo {
+  type: 'alert' | 'confirm' | 'prompt' | 'beforeunload';
+  message: string;
+  defaultValue?: string;
+}
+
+// ── Viewport ──
+
+export interface ViewportSize {
+  width: number;
+  height: number;
+  deviceScaleFactor?: number;
+  isMobile?: boolean;
+  hasTouch?: boolean;
+}
+
+// ── Accessibility ──
+
+export interface AccessibilityNode {
+  role: string;
+  name: string;
+  value?: string;
+  description?: string;
+  checked?: boolean | 'mixed';
+  disabled?: boolean;
+  expanded?: boolean;
+  focused?: boolean;
+  level?: number;
+  selected?: boolean;
+  children?: AccessibilityNode[];
+}
+
+// ── Tabs ──
+
+export interface TabInfo {
+  index: number;
+  url: string;
+  title: string;
+  active: boolean;
+}
+
+// ── File Upload ──
+
+export interface FileUploadOptions {
+  selector: string;
+  filePaths: string[];
+  timeout?: number;
+}

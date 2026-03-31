@@ -14,6 +14,7 @@ import { actionRoutes } from './routes/actions.js';
 import { javascriptRoutes } from './routes/javascript.js';
 import { cookieRoutes } from './routes/cookies.js';
 import { screenshotRoutes } from './routes/screenshots.js';
+import { advancedRoutes } from './routes/advanced.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { createAuthHook } from './middleware/auth.js';
 import { registerRateLimit } from './middleware/rate-limit.js';
@@ -85,6 +86,7 @@ export async function buildApp(config: AppConfig = {}): Promise<FastifyInstance>
   await app.register(javascriptRoutes, { prefix: '/sessions' });
   await app.register(cookieRoutes, { prefix: '/sessions' });
   await app.register(screenshotRoutes, { prefix: '/sessions' });
+  await app.register(advancedRoutes, { prefix: '/sessions' });
 
   // Health check
   app.get('/health', async () => ({ status: 'ok' }));

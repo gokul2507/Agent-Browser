@@ -1,4 +1,4 @@
-import type { Page } from 'puppeteer-core';
+import type { Page, Browser } from 'puppeteer-core';
 import {
   extractContent,
   extractLinks,
@@ -7,6 +7,7 @@ import {
   extractText,
 } from './extractor.js';
 import * as actions from './actions.js';
+import * as advanced from './advanced.js';
 import type {
   NavigateOptions,
   NavigateResult,
@@ -27,6 +28,13 @@ import type {
   Cookie,
   InteractiveElement,
   ClickByTextResult,
+  ConsoleMessage,
+  NetworkRequest,
+  NetworkFilter,
+  DialogInfo,
+  ViewportSize,
+  AccessibilityNode,
+  FileUploadOptions,
 } from './types.js';
 
 export class PageController {
@@ -279,5 +287,95 @@ export class PageController {
     if (!this.page.isClosed()) {
       await this.page.close();
     }
+  }
+
+  // ── Hover ──
+
+  async hover(selector: string, timeout?: number): Promise<void> {
+    return advanced.hover(this.page, selector, timeout);
+  }
+
+  // ── Viewport ──
+
+  async setViewport(viewport: ViewportSize): Promise<void> {
+    return advanced.setViewport(this.page, viewport);
+  }
+
+  async getViewport(): Promise<ViewportSize> {
+    return advanced.getViewport(this.page);
+  }
+
+  // ── Console Capture ──
+
+  private consoleCapture?: ReturnType<typeof advanced.startConsoleCapture>;
+
+  startConsoleCapture(): void {
+    this.consoleCapture?.stop();
+    this.consoleCapture = advanced.startConsoleCapture(this.page);
+  }
+
+  getConsoleMessages(filter?: { level?: string; clear?: boolean }): ConsoleMessage[] {
+    return this.consoleCapture?.getMessages(filter) ?? [];
+  }
+
+  stopConsoleCapture(): void {
+    this.consoleCapture?.stop();
+    this.consoleCapture = undefined;
+  }
+
+  // ── Network Capture ──
+
+  private networkCapture?: ReturnType<typeof advanced.startNetworkCapture>;
+
+  startNetworkCapture(): void {
+    this.networkCapture?.stop();
+    this.networkCapture = advanced.startNetworkCapture(this.page);
+  }
+
+  getNetworkRequests(filter?: NetworkFilter): NetworkRequest[] {
+    return this.networkCapture?.getRequests(filter) ?? [];
+  }
+
+  clearNetworkRequests(): void {
+    this.networkCapture?.clear();
+  }
+
+  stopNetworkCapture(): void {
+    this.networkCapture?.stop();
+    this.networkCapture = undefined;
+  }
+
+  // ── Dialog Handling ──
+
+  private dialogHandler?: ReturnType<typeof advanced.setupDialogHandler>;
+
+  setupDialogHandler(action: 'accept' | 'dismiss' = 'dismiss', promptText?: string): void {
+    this.dialogHandler?.stop();
+    this.dialogHandler = advanced.setupDialogHandler(this.page);
+    this.dialogHandler.setAutoResponse(action, promptText);
+  }
+
+  setDialogResponse(action: 'accept' | 'dismiss', promptText?: string): void {
+    this.dialogHandler?.setAutoResponse(action, promptText);
+  }
+
+  getDialogs(): DialogInfo[] {
+    return this.dialogHandler?.getDialogs() ?? [];
+  }
+
+  clearDialogs(): void {
+    this.dialogHandler?.clear();
+  }
+
+  // ── File Upload ──
+
+  async uploadFile(options: FileUploadOptions): Promise<void> {
+    return advanced.uploadFile(this.page, options);
+  }
+
+  // ── Accessibility ──
+
+  async getAccessibilitySnapshot(options?: { interestingOnly?: boolean; root?: string }): Promise<AccessibilityNode | null> {
+    return advanced.getAccessibilitySnapshot(this.page, options);
   }
 }
