@@ -19,26 +19,31 @@ const { server, sessionManager } = createServer({
   },
 });
 
+// DON'T start Lightpanda eagerly — engines start lazily on first create_session call.
+// This means Chromium-only users don't need Lightpanda installed at all.
+
 // ── Start MCP over stdio ──
 const transport = new StdioServerTransport();
 await server.connect(transport);
 console.error('AI Browser MCP Server running on stdio');
 
-// ── Start Dashboard (non-blocking, fully isolated from stdout) ──
-const dashboardPort = Number(process.env.DASHBOARD_PORT ?? 3000);
-setTimeout(async () => {
-  try {
-    const { buildApp } = await import('@agent_browser/api');
-    const app = await buildApp({
-      sessionManager,
-      logLevel: 'silent',
-    });
-    await app.listen({ host: '127.0.0.1', port: dashboardPort });
-    console.error(`Dashboard running at http://127.0.0.1:${dashboardPort}/dashboard`);
-  } catch {
-    // Silently ignore — dashboard is optional
-  }
-}, 500);
+// ── Start Dashboard (opt-in via DASHBOARD=true env var) ──
+if (process.env.DASHBOARD === 'true') {
+  const dashboardPort = Number(process.env.DASHBOARD_PORT ?? 3000);
+  setTimeout(async () => {
+    try {
+      const { buildApp } = await import('@agent_browser/api');
+      const app = await buildApp({
+        sessionManager,
+        logLevel: 'silent',
+      });
+      await app.listen({ host: '127.0.0.1', port: dashboardPort });
+      console.error(`Dashboard running at http://127.0.0.1:${dashboardPort}/dashboard`);
+    } catch {
+      // Silently skip
+    }
+  }, 1000);
+}
 
 // ── Graceful shutdown ──
 process.on('SIGINT', async () => {

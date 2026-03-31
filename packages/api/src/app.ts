@@ -66,9 +66,9 @@ export async function buildApp(config: AppConfig = {}): Promise<FastifyInstance>
   });
 
   // Use existing SessionManager if provided (shared with MCP), otherwise create new
-  const ownsSessionManager = !config.sessionManager;
   const sessionManager = config.sessionManager ?? new SessionManager(config.browser, config.session, config.chromium);
-  if (ownsSessionManager) {
+  const ownsSessionManager = !config.sessionManager;
+  if (ownsSessionManager && !sessionManager['engines']?.size) {
     await sessionManager.start();
   }
 

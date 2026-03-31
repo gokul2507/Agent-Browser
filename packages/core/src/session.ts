@@ -55,9 +55,8 @@ export class SessionManager {
   }
 
   async start(): Promise<void> {
-    // Start the default engine
-    const defaultEngine = this.getEngine(this.config.defaultEngine);
-    await defaultEngine.start();
+    // Don't start any engine eagerly — engines start lazily on first createSession call.
+    // This allows Chromium-only users to skip Lightpanda entirely.
     this.startCleanupLoop();
   }
 
@@ -78,10 +77,9 @@ export class SessionManager {
   async createSession(engine?: EngineType): Promise<SessionInfo> {
     const requestedEngine = engine ?? this.config.defaultEngine;
 
-    // Ensure some engine is running
-    const defaultEngine = this.getEngine(this.config.defaultEngine);
-    if (!defaultEngine.isRunning) {
-      await this.start();
+    // Ensure cleanup loop is running
+    if (!this.cleanupInterval) {
+      this.startCleanupLoop();
     }
 
     if (this.sessions.size >= this.config.maxSessions) {

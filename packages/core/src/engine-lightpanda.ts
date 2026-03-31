@@ -50,6 +50,28 @@ export class LightpandaEngine implements BrowserEngine {
     });
 
     this._isRunning = true;
+
+    // Wait for Lightpanda to be ready to accept connections
+    await this.waitForReady();
+  }
+
+  private async waitForReady(): Promise<void> {
+    const { createConnection } = await import('node:net');
+    for (let i = 0; i < 20; i++) {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const socket = createConnection(this.config.port, this.config.host, () => {
+            socket.destroy();
+            resolve();
+          });
+          socket.on('error', reject);
+          socket.setTimeout(200, () => { socket.destroy(); reject(new Error('timeout')); });
+        });
+        return; // Connected — Lightpanda is ready
+      } catch {
+        await new Promise((r) => setTimeout(r, 200));
+      }
+    }
   }
 
   async connect(): Promise<Browser> {
@@ -60,8 +82,9 @@ export class LightpandaEngine implements BrowserEngine {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         return await puppeteer.connect({ browserWSEndpoint: this.wsEndpoint });
-      } catch (err) {
-        lastError = err instanceof Error ? err : new Error(String(err));
+      } catch (err: any) {
+        const msg = err?.message ?? (typeof err === 'string' ? err : JSON.stringify(err));
+        lastError = new Error(msg);
         if (attempt < MAX_RETRIES) {
           await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * attempt));
           if (!this._isRunning) await this.start();
