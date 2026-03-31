@@ -21,7 +21,7 @@ export function createServer(config: McpBrowserConfig = {}): {
 } {
   const server = new McpServer({
     name: 'ai-browser',
-    version: '0.2.1',
+    version: '0.2.2',
   });
 
   const sessionManager = new SessionManager(config.browser, config.session);

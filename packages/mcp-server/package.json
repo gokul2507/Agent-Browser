@@ -1,6 +1,6 @@
 {
   "name": "@agent_browser/mcp-server",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "MCP Server for AI Browser \u2014 28 tools for AI agents to browse the web via Claude Code",
   "type": "module",
   "license": "MIT",
@@ -24,6 +24,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
+    "mcp-server": "dist/index.js",
     "ai-browser-mcp": "dist/index.js"
   },
   "files": [

@@ -1,6 +1,6 @@
 {
   "name": "@agent_browser/core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Core browser engine for AI Browser \u2014 dual engine (Lightpanda + Chromium) abstraction layer",
   "type": "module",
   "license": "MIT",
