@@ -46,6 +46,11 @@ export {
   switchTab,
   openNewTab,
   closeTab,
+  batchFill,
+  waitForTextGone,
+  evaluateOnElement,
+  saveToFile,
+  saveJsonToFile,
 } from './advanced.js';
 
 // Types
@@ -85,6 +90,7 @@ export type {
   AccessibilityNode,
   TabInfo,
   FileUploadOptions,
+  BatchFillField,
 } from './types.js';
 
 // Cookie utilities

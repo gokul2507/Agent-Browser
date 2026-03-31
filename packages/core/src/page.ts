@@ -35,6 +35,7 @@ import type {
   ViewportSize,
   AccessibilityNode,
   FileUploadOptions,
+  BatchFillField,
 } from './types.js';
 
 export class PageController {
@@ -377,5 +378,23 @@ export class PageController {
 
   async getAccessibilitySnapshot(options?: { interestingOnly?: boolean; root?: string }): Promise<AccessibilityNode | null> {
     return advanced.getAccessibilitySnapshot(this.page, options);
+  }
+
+  // ── Batch Form Fill ──
+
+  async batchFill(fields: BatchFillField[]): Promise<void> {
+    return advanced.batchFill(this.page, fields);
+  }
+
+  // ── Wait for Text Gone ──
+
+  async waitForTextGone(text: string, timeout?: number): Promise<void> {
+    return advanced.waitForTextGone(this.page, text, timeout);
+  }
+
+  // ── Element-Scoped JS ──
+
+  async evaluateOnElement(selector: string, expression: string): Promise<unknown> {
+    return advanced.evaluateOnElement(this.page, selector, expression);
   }
 }

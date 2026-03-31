@@ -12,9 +12,19 @@ import type {
 const DEFAULT_TIMEOUT = 30_000;
 
 export async function click(page: Page, options: ClickOptions): Promise<void> {
-  const { selector, timeout = DEFAULT_TIMEOUT } = options;
+  const { selector, timeout = DEFAULT_TIMEOUT, button = 'left', clickCount = 1, modifiers } = options;
   await page.waitForSelector(selector, { timeout });
-  await page.click(selector);
+
+  // Hold modifier keys if specified
+  if (modifiers?.length) {
+    for (const mod of modifiers) await page.keyboard.down(mod);
+  }
+
+  await page.click(selector, { button, count: clickCount });
+
+  if (modifiers?.length) {
+    for (const mod of modifiers.reverse()) await page.keyboard.up(mod);
+  }
 }
 
 /**

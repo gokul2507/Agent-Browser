@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/github/stars/gokul2507/Agent-Browser)](https://github.com/gokul2507/Agent-Browser)
 
-An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda-io/browser) and Chromium. Enables AI agents to navigate, extract, and interact with the web through **42 MCP tools**, a **REST API**, and **JS/Python SDKs**.
+An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda-io/browser) and Chromium. Enables AI agents to navigate, extract, and interact with the web through **55 MCP tools**, a **REST API**, and **JS/Python SDKs**.
 
 ## Installation
 
@@ -375,7 +375,7 @@ Supported formats: JSON (EditThisCookie, DevTools), Netscape cookie.txt (curl, w
 | `POST` | `/sessions/:id/tabs/new` | Open new tab |
 | `DELETE` | `/sessions/:id/tabs/:tabIndex` | Close tab |
 
-### MCP Tools (42 tools)
+### MCP Tools (55 tools)
 
 | Tool | Description |
 |------|-------------|
@@ -393,7 +393,7 @@ Supported formats: JSON (EditThisCookie, DevTools), Netscape cookie.txt (curl, w
 | `get_tables` | Extract HTML tables as structured arrays |
 | `get_metadata` | Extract page metadata |
 | **Actions** | |
-| `click` | Click element by CSS selector |
+| `click` | Click element (supports right-click, double-click, modifier keys) |
 | `click_by_text` | Click by visible text (returns element info). Supports `containerSelector` to scope search. |
 | `click_at_coordinates` | Click at x,y pixel position |
 | `fill` | Clear and fill input field |
@@ -435,6 +435,15 @@ Supported formats: JSON (EditThisCookie, DevTools), Netscape cookie.txt (curl, w
 | `switch_tab` | Switch to a tab by index |
 | `open_new_tab` | Open new tab, optionally navigate to URL |
 | `close_tab` | Close a tab by index |
+| **Batch & Modifiers** | |
+| `batch_fill_form` | Fill multiple form fields in one call (text, checkbox, radio, select) |
+| `wait_for_text_gone` | Wait for text to disappear (loading spinners, progress messages) |
+| `evaluate_on_element` | Execute JS scoped to a specific element |
+| **Save to File** | |
+| `save_screenshot_to_file` | Take screenshot and save directly to local file |
+| `save_console_to_file` | Save captured console messages to JSON file |
+| `save_network_to_file` | Save captured network requests to JSON file |
+| `save_accessibility_to_file` | Save accessibility tree to JSON file |
 
 ### Structured Output Format
 
@@ -552,7 +561,7 @@ ai-browser/
 ├── packages/
 │   ├── core/                 # Dual engine (Lightpanda + Chromium), SessionManager, PageController
 │   ├── api/                  # REST API server (Fastify) + Dashboard
-│   ├── mcp-server/           # MCP server for Claude Code (42 tools) + embedded dashboard
+│   ├── mcp-server/           # MCP server for Claude Code (55 tools) + embedded dashboard
 │   └── sdk-js/               # TypeScript SDK
 ├── sdks/
 │   └── python/               # Python SDK (httpx + pydantic)
@@ -576,7 +585,7 @@ ai-browser/
 |---------|-------------|
 | [`@agent_browser/core`](https://www.npmjs.com/package/@agent_browser/core) | Dual browser engine (Lightpanda + Chromium), session management, page control, content extraction, SPA actions, cookie utilities |
 | [`@agent_browser/api`](https://www.npmjs.com/package/@agent_browser/api) | REST API with 45+ endpoints, auth, rate limiting, logging, dashboard |
-| [`@agent_browser/mcp-server`](https://www.npmjs.com/package/@agent_browser/mcp-server) | MCP server with 42 tools + embedded dashboard for Claude Code |
+| [`@agent_browser/mcp-server`](https://www.npmjs.com/package/@agent_browser/mcp-server) | MCP server with 55 tools + embedded dashboard for Claude Code |
 | [`@agent_browser/sdk`](https://www.npmjs.com/package/@agent_browser/sdk) | TypeScript SDK wrapping the REST API |
 | [`ai-browser-sdk`](https://pypi.org/project/ai-browser-sdk/) | Python SDK with async support and Pydantic models |
 

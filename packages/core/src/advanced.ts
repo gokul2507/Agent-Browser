@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs';
 import type { Page, Browser, CDPSession } from 'puppeteer-core';
 import type {
   ConsoleMessage,
@@ -8,6 +9,7 @@ import type {
   AccessibilityNode,
   TabInfo,
   FileUploadOptions,
+  BatchFillField,
 } from './types.js';
 
 // ── Hover ──
@@ -318,4 +320,110 @@ export async function closeTab(browser: Browser, index: number): Promise<void> {
     throw new Error('Cannot close the last tab');
   }
   await pages[index].close();
+}
+
+// ── Batch Form Fill ──
+
+export async function batchFill(page: Page, fields: BatchFillField[]): Promise<void> {
+  for (const field of fields) {
+    const { selector, value, type = 'text', force = false } = field;
+
+    switch (type) {
+      case 'checkbox': {
+        const checked = await page.evaluate((sel: string) => {
+          const el = document.querySelector(sel) as HTMLInputElement;
+          return el?.checked ?? false;
+        }, selector);
+        const shouldBeChecked = value === 'true' || value === '1';
+        if (checked !== shouldBeChecked) {
+          await page.click(selector);
+        }
+        break;
+      }
+      case 'radio': {
+        await page.click(selector);
+        break;
+      }
+      case 'select': {
+        await page.select(selector, value);
+        break;
+      }
+      case 'text':
+      default: {
+        if (force) {
+          await page.evaluate(
+            (sel: string, val: string) => {
+              const el = document.querySelector(sel) as HTMLInputElement
+                ?? document.querySelector(sel)?.querySelector('input, textarea') as HTMLInputElement;
+              if (!el) throw new Error(`Input not found: ${sel}`);
+              const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+                ?? Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set;
+              if (setter) setter.call(el, val);
+              else el.value = val;
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+            },
+            selector,
+            value,
+          );
+        } else {
+          await page.click(selector, { count: 3 });
+          await page.keyboard.press('Backspace');
+          await page.type(selector, value);
+        }
+        break;
+      }
+    }
+  }
+}
+
+// ── Wait for Text Gone ──
+
+export async function waitForTextGone(
+  page: Page,
+  text: string,
+  timeout = 30_000,
+): Promise<void> {
+  const start = Date.now();
+
+  while (Date.now() - start < timeout) {
+    const found = await page.evaluate((searchText: string) => {
+      return document.body.innerText.includes(searchText);
+    }, text);
+
+    if (!found) return;
+    await new Promise((r) => setTimeout(r, 200));
+  }
+
+  throw new Error(`Text "${text}" still visible after ${timeout}ms`);
+}
+
+// ── Element-Scoped JS Execution ──
+
+export async function evaluateOnElement(
+  page: Page,
+  selector: string,
+  expression: string,
+): Promise<unknown> {
+  const element = await page.$(selector);
+  if (!element) throw new Error(`Element not found: ${selector}`);
+
+  return page.evaluate(
+    (el: Element, expr: string) => {
+      const fn = new Function('el', `return (${expr})(el)`);
+      return fn(el);
+    },
+    element,
+    expression,
+  );
+}
+
+// ── Save to File Helpers ──
+
+export function saveToFile(data: string, filePath: string): void {
+  writeFileSync(filePath, data, 'utf-8');
+}
+
+export function saveJsonToFile(data: unknown, filePath: string): void {
+  writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
 }

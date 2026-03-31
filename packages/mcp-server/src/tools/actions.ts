@@ -11,19 +11,28 @@ export function registerActionTools(
     {
       title: 'Click Element',
       description:
-        'Click an element on the page by CSS selector. Waits for the element to appear before clicking.',
+        'Click an element by CSS selector. Supports left/right/middle button, double-click, and modifier keys (Alt, Ctrl, Shift, Meta). Waits for element to appear before clicking.',
       inputSchema: {
         sessionId: z.string().describe('The session ID'),
-        selector: z.string().describe('CSS selector of the element to click (e.g., "button.submit", "#login-btn", "a[href=\'/about\']")'),
-        timeout: z.number().optional().describe('Max wait time in ms for element to appear. Defaults to 30000.'),
+        selector: z.string().describe('CSS selector of the element to click'),
+        timeout: z.number().optional().describe('Max wait time in ms. Defaults to 30000.'),
+        button: z.enum(['left', 'right', 'middle']).optional().describe('Mouse button. Defaults to left.'),
+        clickCount: z.number().optional().describe('Number of clicks. Use 2 for double-click. Defaults to 1.'),
+        modifiers: z.array(z.enum(['Alt', 'Control', 'Meta', 'Shift'])).optional().describe('Modifier keys to hold during click. E.g., ["Control"] for Ctrl+click.'),
       },
     },
-    async ({ sessionId, selector, timeout }) => {
+    async ({ sessionId, selector, timeout, button, clickCount, modifiers }) => {
       const page = await sessionManager.getOrCreatePage(sessionId);
       const controller = new PageController(page);
-      await controller.click({ selector, timeout });
+      await controller.click({ selector, timeout, button, clickCount, modifiers });
+      const desc = [
+        button && button !== 'left' ? `${button}-` : '',
+        clickCount === 2 ? 'double-' : clickCount && clickCount > 2 ? `${clickCount}x-` : '',
+        'clicked',
+        modifiers?.length ? ` with ${modifiers.join('+')}` : '',
+      ].join('');
       return {
-        content: [{ type: 'text', text: `Clicked: ${selector}` }],
+        content: [{ type: 'text', text: `${desc}: ${selector}` }],
       };
     },
   );

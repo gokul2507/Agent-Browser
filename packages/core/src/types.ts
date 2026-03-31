@@ -128,6 +128,16 @@ export interface PageContent {
 export interface ClickOptions {
   selector: string;
   timeout?: number;
+  button?: 'left' | 'right' | 'middle';
+  clickCount?: number;
+  modifiers?: Array<'Alt' | 'Control' | 'Meta' | 'Shift'>;
+}
+
+export interface BatchFillField {
+  selector: string;
+  value: string;
+  type?: 'text' | 'checkbox' | 'radio' | 'select';
+  force?: boolean;
 }
 
 export interface FillOptions {

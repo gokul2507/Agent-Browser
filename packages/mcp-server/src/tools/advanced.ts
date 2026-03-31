@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SessionManager, PageController, listTabs, switchTab, openNewTab, closeTab } from '@agent_browser/core';
+import { SessionManager, PageController, listTabs, switchTab, openNewTab, closeTab, saveToFile, saveJsonToFile } from '@agent_browser/core';
 
 export function registerAdvancedTools(
   server: McpServer,
@@ -315,6 +315,167 @@ export function registerAdvancedTools(
         session.pages.set('default', pages[0]);
       }
       return { content: [{ type: 'text', text: `Closed tab ${index}` }] };
+    },
+  );
+
+  // ── Batch Form Fill ──
+
+  server.registerTool(
+    'batch_fill_form',
+    {
+      title: 'Batch Fill Form',
+      description:
+        'Fill multiple form fields in a single call. Supports text inputs, checkboxes, radio buttons, and select dropdowns. Use force=true for shadow DOM / custom components.',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        fields: z.array(z.object({
+          selector: z.string().describe('CSS selector of the field'),
+          value: z.string().describe('Value to set. For checkboxes, use "true"/"false".'),
+          type: z.enum(['text', 'checkbox', 'radio', 'select']).optional().describe('Field type. Defaults to text.'),
+          force: z.boolean().optional().describe('Use JS injection for shadow DOM. Defaults to false.'),
+        })).describe('Array of fields to fill'),
+      },
+    },
+    async ({ sessionId, fields }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      await controller.batchFill(fields);
+      return {
+        content: [{ type: 'text', text: `Filled ${fields.length} form fields` }],
+      };
+    },
+  );
+
+  // ── Wait for Text Gone ──
+
+  server.registerTool(
+    'wait_for_text_gone',
+    {
+      title: 'Wait for Text to Disappear',
+      description:
+        'Wait until specific text is no longer visible on the page. Useful for waiting for loading spinners, "Please wait..." messages, or progress indicators to vanish.',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        text: z.string().describe('The text to wait for disappearing'),
+        timeout: z.number().optional().describe('Max wait time in ms. Defaults to 30000.'),
+      },
+    },
+    async ({ sessionId, text, timeout }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      await controller.waitForTextGone(text, timeout);
+      return {
+        content: [{ type: 'text', text: `Text "${text}" has disappeared` }],
+      };
+    },
+  );
+
+  // ── Element-Scoped JS ──
+
+  server.registerTool(
+    'evaluate_on_element',
+    {
+      title: 'Evaluate JS on Element',
+      description:
+        'Execute JavaScript scoped to a specific DOM element. The expression receives the element as "el". Example: "(el) => el.textContent" or "(el) => el.getBoundingClientRect()".',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        selector: z.string().describe('CSS selector of the target element'),
+        expression: z.string().describe('JS arrow function receiving the element. E.g., "(el) => el.textContent"'),
+      },
+    },
+    async ({ sessionId, selector, expression }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      const result = await controller.evaluateOnElement(selector, expression);
+      const text = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
+      return { content: [{ type: 'text', text }] };
+    },
+  );
+
+  // ── Save to File (on screenshot/console/network) ──
+
+  server.registerTool(
+    'save_screenshot_to_file',
+    {
+      title: 'Save Screenshot to File',
+      description: 'Take a screenshot and save it directly to a local file.',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        filePath: z.string().describe('Absolute path to save the screenshot'),
+        fullPage: z.boolean().optional().describe('Capture full scrollable page. Defaults to false.'),
+        type: z.enum(['png', 'jpeg', 'webp']).optional().describe('Image format. Defaults to png.'),
+        quality: z.number().min(0).max(100).optional().describe('Quality for jpeg/webp. 0-100.'),
+      },
+    },
+    async ({ sessionId, filePath, fullPage, type: imgType, quality }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      const result = await controller.screenshot({ fullPage, type: imgType, quality });
+      const buffer = Buffer.from(result.data, 'base64');
+      const { writeFileSync } = await import('node:fs');
+      writeFileSync(filePath, buffer);
+      return { content: [{ type: 'text', text: `Screenshot saved to ${filePath}` }] };
+    },
+  );
+
+  server.registerTool(
+    'save_console_to_file',
+    {
+      title: 'Save Console Messages to File',
+      description: 'Save captured console messages to a JSON file.',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        filePath: z.string().describe('Absolute path to save the JSON file'),
+        level: z.enum(['log', 'info', 'warn', 'error', 'debug', 'trace']).optional().describe('Filter by level'),
+      },
+    },
+    async ({ sessionId, filePath, level }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      const messages = controller.getConsoleMessages({ level });
+      saveJsonToFile(messages, filePath);
+      return { content: [{ type: 'text', text: `Saved ${messages.length} console messages to ${filePath}` }] };
+    },
+  );
+
+  server.registerTool(
+    'save_network_to_file',
+    {
+      title: 'Save Network Requests to File',
+      description: 'Save captured network requests to a JSON file.',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        filePath: z.string().describe('Absolute path to save the JSON file'),
+        excludeStatic: z.boolean().optional().describe('Exclude images/fonts/CSS. Defaults to false.'),
+      },
+    },
+    async ({ sessionId, filePath, excludeStatic }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      const requests = controller.getNetworkRequests({ excludeStatic });
+      saveJsonToFile(requests, filePath);
+      return { content: [{ type: 'text', text: `Saved ${requests.length} network requests to ${filePath}` }] };
+    },
+  );
+
+  server.registerTool(
+    'save_accessibility_to_file',
+    {
+      title: 'Save Accessibility Snapshot to File',
+      description: 'Save the accessibility tree to a JSON file.',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        filePath: z.string().describe('Absolute path to save the JSON file'),
+        interestingOnly: z.boolean().optional().describe('Only interesting nodes. Defaults to true.'),
+      },
+    },
+    async ({ sessionId, filePath, interestingOnly }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      const snapshot = await controller.getAccessibilitySnapshot({ interestingOnly });
+      saveJsonToFile(snapshot, filePath);
+      return { content: [{ type: 'text', text: `Accessibility snapshot saved to ${filePath}` }] };
     },
   );
 }
