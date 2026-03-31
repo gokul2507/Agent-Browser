@@ -17,7 +17,7 @@ npx @agent_browser/mcp-server
 npm install @agent_browser/sdk
 
 # Python SDK
-pip install ai-browser-sdk-sdk
+pip install ai-browser-sdk
 
 # REST API Server
 npx @agent_browser/api
@@ -117,9 +117,24 @@ API_PORT=3001 API_KEY=my-secret node packages/api/dist/index.js
 
 ### Open the Dashboard
 
-Visit `http://localhost:3000/dashboard` to see the visual monitoring UI with session list, content viewer, interactive console, and screenshots.
+The dashboard is **opt-in**. To enable it with the MCP server, set `DASHBOARD=true`:
 
-When using the MCP server, the dashboard starts automatically on port 3000 and shares the same session manager — all MCP-created sessions appear on the dashboard in real-time.
+```json
+{
+  "mcpServers": {
+    "ai-browser": {
+      "command": "npx",
+      "args": ["@agent_browser/mcp-server"],
+      "env": {
+        "DASHBOARD": "true",
+        "DASHBOARD_PORT": "4000"
+      }
+    }
+  }
+}
+```
+
+Then visit `http://localhost:4000/dashboard` to see sessions, content, interactive console, and screenshots in real-time.
 
 ## Usage
 
@@ -132,7 +147,11 @@ Add to your `.mcp.json` or Claude Desktop config:
   "mcpServers": {
     "ai-browser": {
       "command": "npx",
-      "args": ["@agent_browser/mcp-server"]
+      "args": ["@agent_browser/mcp-server"],
+      "env": {
+        "DASHBOARD": "true",
+        "DASHBOARD_PORT": "4000"
+      }
     }
   }
 }
@@ -145,13 +164,17 @@ Or if running from source:
   "mcpServers": {
     "ai-browser": {
       "command": "node",
-      "args": ["/path/to/Agent-Browser/packages/mcp-server/dist/index.js"]
+      "args": ["/path/to/Agent-Browser/packages/mcp-server/dist/index.js"],
+      "env": {
+        "DASHBOARD": "true",
+        "DASHBOARD_PORT": "4000"
+      }
     }
   }
 }
 ```
 
-The MCP server automatically starts a dashboard at `http://localhost:3000/dashboard`.
+When `DASHBOARD=true`, a web dashboard starts at `http://localhost:4000/dashboard` showing all MCP sessions in real-time. Engines start lazily — Lightpanda or Chromium only launches when the first session is created.
 
 Then use tools like:
 
@@ -212,7 +235,7 @@ npm install @agent_browser/sdk
 ```
 
 ```typescript
-import { AIBrowser } from '@ai-browser/sdk';
+import { AIBrowser } from '@agent_browser/sdk';
 
 const browser = new AIBrowser('http://localhost:3000');
 const session = await browser.createSession();
@@ -442,7 +465,8 @@ All configuration is via environment variables:
 | `CHROMIUM_PATH` | *(auto-detected)* | Path to Chrome/Chromium binary |
 | `CHROMIUM_HEADLESS` | `true` | Run Chromium in headless mode |
 | `DEFAULT_ENGINE` | `lightpanda` | Default engine: `lightpanda`, `chromium`, or `auto` |
-| `DASHBOARD_PORT` | `3000` | Dashboard port (when running via MCP server) |
+| `DASHBOARD` | *(empty)* | Set to `true` to enable the web dashboard (MCP server only) |
+| `DASHBOARD_PORT` | `3000` | Dashboard port (when `DASHBOARD=true`) |
 | `API_HOST` | `127.0.0.1` | API server bind host |
 | `API_PORT` | `3000` | API server port |
 | `API_KEY` | *(empty)* | API key for authentication (disabled if empty) |
@@ -533,7 +557,7 @@ npx tsx examples/basic-navigation.ts
 ```
 
 ```typescript
-import { AIBrowser } from '@ai-browser/sdk';
+import { AIBrowser } from '@agent_browser/sdk';
 
 const browser = new AIBrowser('http://localhost:3000');
 const session = await browser.createSession();
@@ -631,7 +655,8 @@ async with AIBrowser("http://localhost:3000") as browser:
       "command": "npx",
       "args": ["@agent_browser/mcp-server"],
       "env": {
-        "DASHBOARD_PORT": "3000"
+        "DASHBOARD": "true",
+        "DASHBOARD_PORT": "4000"
       }
     }
   }
@@ -654,7 +679,7 @@ pnpm test
 pnpm -r exec tsc --noEmit
 
 # Development mode (auto-reload API server)
-pnpm --filter @ai-browser/api dev
+pnpm --filter @agent_browser/api dev
 ```
 
 ## Tech Stack
