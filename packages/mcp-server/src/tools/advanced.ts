@@ -318,34 +318,6 @@ export function registerAdvancedTools(
     },
   );
 
-  // ── Batch Form Fill ──
-
-  server.registerTool(
-    'batch_fill_form',
-    {
-      title: 'Batch Fill Form',
-      description:
-        'Fill multiple form fields in a single call. Supports text inputs, checkboxes, radio buttons, and select dropdowns. Use force=true for shadow DOM / custom components.',
-      inputSchema: {
-        sessionId: z.string().describe('The session ID'),
-        fields: z.array(z.object({
-          selector: z.string().describe('CSS selector of the field'),
-          value: z.string().describe('Value to set. For checkboxes, use "true"/"false".'),
-          type: z.enum(['text', 'checkbox', 'radio', 'select']).optional().describe('Field type. Defaults to text.'),
-          force: z.boolean().optional().describe('Use JS injection for shadow DOM. Defaults to false.'),
-        })).describe('Array of fields to fill'),
-      },
-    },
-    async ({ sessionId, fields }) => {
-      const page = await sessionManager.getOrCreatePage(sessionId);
-      const controller = new PageController(page);
-      await controller.batchFill(fields);
-      return {
-        content: [{ type: 'text', text: `Filled ${fields.length} form fields` }],
-      };
-    },
-  );
-
   // ── Wait for Text Gone ──
 
   server.registerTool(
@@ -502,51 +474,6 @@ export function registerAdvancedTools(
       const controller = new PageController(page);
       await controller.batchFill(fields);
       return { content: [{ type: 'text', text: `Filled ${fields.length} form fields` }] };
-    },
-  );
-
-  // ── Wait for Text Gone ──
-
-  server.registerTool(
-    'wait_for_text_gone',
-    {
-      title: 'Wait for Text to Disappear',
-      description:
-        'Wait until specific text is no longer visible on the page. Useful for waiting for loading spinners, "Please wait..." messages, or progress indicators to vanish.',
-      inputSchema: {
-        sessionId: z.string().describe('The session ID'),
-        text: z.string().describe('The text to wait for disappearing'),
-        timeout: z.number().optional().describe('Max wait time in ms. Defaults to 30000.'),
-      },
-    },
-    async ({ sessionId, text, timeout }) => {
-      const page = await sessionManager.getOrCreatePage(sessionId);
-      const controller = new PageController(page);
-      await controller.waitForTextGone(text, timeout);
-      return { content: [{ type: 'text', text: `Text "${text}" has disappeared` }] };
-    },
-  );
-
-  // ── Element-Scoped JS ──
-
-  server.registerTool(
-    'evaluate_on_element',
-    {
-      title: 'Evaluate JS on Element',
-      description:
-        'Execute JavaScript scoped to a specific DOM element. The expression receives the element as "el". Example: "(el) => el.textContent" or "(el) => el.getBoundingClientRect()".',
-      inputSchema: {
-        sessionId: z.string().describe('The session ID'),
-        selector: z.string().describe('CSS selector of the target element'),
-        expression: z.string().describe('JS arrow function receiving the element. E.g., "(el) => el.textContent"'),
-      },
-    },
-    async ({ sessionId, selector, expression }) => {
-      const page = await sessionManager.getOrCreatePage(sessionId);
-      const controller = new PageController(page);
-      const result = await controller.evaluateOnElement(selector, expression);
-      const text = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
-      return { content: [{ type: 'text', text }] };
     },
   );
 

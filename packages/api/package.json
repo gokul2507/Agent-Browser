@@ -1,6 +1,6 @@
 {
   "name": "@agent_browser/api",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "REST API server for AI Browser with dashboard, auth, and rate limiting",
   "type": "module",
   "license": "MIT",

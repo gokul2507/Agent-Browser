@@ -1,6 +1,6 @@
 {
   "name": "@agent_browser/sdk",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "JavaScript/TypeScript SDK for AI Browser \u2014 control a headless browser from your agent",
   "type": "module",
   "license": "MIT",
