@@ -10,15 +10,29 @@ An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda
 ## Installation
 
 ```bash
-# MCP Server (Claude Code / Claude Desktop)
+# MCP Server (Claude Code / Claude Desktop) — install once
 npm install -g @agent_browser/mcp-server
-# Then use "agents-browser" as the command in your MCP config
+
+# Verify installation
+which agents-browser
 
 # JavaScript/TypeScript SDK
 npm install @agent_browser/sdk
 
 # Python SDK
 pip install ai-browser-sdk
+```
+
+Then add to your `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "agents-browser": {
+      "command": "agents-browser"
+    }
+  }
+}
 ```
 
 ```
@@ -85,11 +99,11 @@ create_session({ engine: "auto" })
 ### Option A: Use Published Packages (recommended)
 
 ```bash
-# Install the MCP server globally
+# Install the MCP server globally (one time)
 npm install -g @agent_browser/mcp-server
 
-# Verify it works
-agents-browser --help
+# Verify installation
+which agents-browser
 ```
 
 ### Option B: From Source
