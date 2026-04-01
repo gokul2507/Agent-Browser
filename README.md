@@ -11,16 +11,14 @@ An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda
 
 ```bash
 # MCP Server (Claude Code / Claude Desktop)
-npx @agent_browser/mcp-server
+npm install -g @agent_browser/mcp-server
+# Then use "agents-browser" as the command in your MCP config
 
 # JavaScript/TypeScript SDK
 npm install @agent_browser/sdk
 
 # Python SDK
 pip install ai-browser-sdk
-
-# REST API Server
-npx @agent_browser/api
 ```
 
 ```
@@ -86,14 +84,12 @@ create_session({ engine: "auto" })
 
 ### Option A: Use Published Packages (recommended)
 
-No cloning needed. Just run:
-
 ```bash
-# Start MCP server (Claude Code integration)
-npx @agent_browser/mcp-server
+# Install the MCP server globally
+npm install -g @agent_browser/mcp-server
 
-# Or start REST API server
-npx @agent_browser/api
+# Verify it works
+agents-browser --help
 ```
 
 ### Option B: From Source
@@ -122,9 +118,8 @@ The dashboard is **opt-in**. To enable it with the MCP server, set `DASHBOARD=tr
 ```json
 {
   "mcpServers": {
-    "ai-browser": {
-      "command": "npx",
-      "args": ["@agent_browser/mcp-server"],
+    "agents-browser": {
+      "command": "agents-browser",
       "env": {
         "DASHBOARD": "true",
         "DASHBOARD_PORT": "4000"
@@ -140,14 +135,17 @@ Then visit `http://localhost:4000/dashboard` to see sessions, content, interacti
 
 ### MCP Server (Claude Code)
 
-Add to your `.mcp.json` or Claude Desktop config:
+Install globally, then add to your `.mcp.json` or Claude Desktop config:
+
+```bash
+npm install -g @agent_browser/mcp-server
+```
 
 ```json
 {
   "mcpServers": {
-    "ai-browser": {
-      "command": "npx",
-      "args": ["@agent_browser/mcp-server"],
+    "agents-browser": {
+      "command": "agents-browser",
       "env": {
         "DASHBOARD": "true",
         "DASHBOARD_PORT": "4000"
@@ -162,7 +160,7 @@ Or if running from source:
 ```json
 {
   "mcpServers": {
-    "ai-browser": {
+    "agents-browser": {
       "command": "node",
       "args": ["/path/to/Agent-Browser/packages/mcp-server/dist/index.js"],
       "env": {
@@ -697,12 +695,16 @@ async with AIBrowser("http://localhost:3000") as browser:
 
 ### MCP Config
 
+```bash
+# Install globally (one time)
+npm install -g @agent_browser/mcp-server
+```
+
 ```json
 {
   "mcpServers": {
-    "ai-browser": {
-      "command": "npx",
-      "args": ["@agent_browser/mcp-server"],
+    "agents-browser": {
+      "command": "agents-browser",
       "env": {
         "DASHBOARD": "true",
         "DASHBOARD_PORT": "4000"

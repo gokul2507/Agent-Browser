@@ -1,6 +1,6 @@
 [project]
 name = "ai-browser-sdk"
-version = "0.2.3"
+version = "0.2.7"
 description = "Python SDK for AI Browser — interact with the web through AI-friendly APIs"
 readme = {text = "Python SDK for AI Browser. See https://github.com/gokul2507/Agent-Browser for full documentation.", content-type = "text/plain"}
 license = "MIT"
