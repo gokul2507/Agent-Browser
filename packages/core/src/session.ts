@@ -132,6 +132,8 @@ export class SessionManager {
     };
   }
 
+  private autoSessionId: string | null = null;
+
   getSession(id: string): Session {
     const session = this.sessions.get(id);
     if (!session) {
@@ -139,6 +141,24 @@ export class SessionManager {
     }
     session.lastActivity = new Date();
     return session;
+  }
+
+  /**
+   * Get or auto-create a default session.
+   * If sessionId is provided, use it. Otherwise, reuse or create an auto-session.
+   */
+  async getOrAutoSession(sessionId?: string, engine?: EngineType): Promise<string> {
+    if (sessionId) return sessionId;
+
+    // Reuse existing auto-session if still alive
+    if (this.autoSessionId && this.sessions.has(this.autoSessionId)) {
+      return this.autoSessionId;
+    }
+
+    // Auto-create a new session
+    const info = await this.createSession(engine ?? this.config.defaultEngine);
+    this.autoSessionId = info.id;
+    return info.id;
   }
 
   async getOrCreatePage(sessionId: string, pageId?: string): Promise<Page> {

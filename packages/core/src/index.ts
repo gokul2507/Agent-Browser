@@ -51,6 +51,10 @@ export {
   evaluateOnElement,
   saveToFile,
   saveJsonToFile,
+  wait,
+  runScript,
+  fillCombobox,
+  fillSlider,
 } from './advanced.js';
 
 // Types

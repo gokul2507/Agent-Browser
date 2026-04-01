@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SessionManager, PageController, listTabs, switchTab, openNewTab, closeTab, saveToFile, saveJsonToFile } from '@agent_browser/core';
+import { SessionManager, PageController, listTabs, switchTab, openNewTab, closeTab, saveToFile, saveJsonToFile, wait, runScript } from '@agent_browser/core';
 
 export function registerAdvancedTools(
   server: McpServer,
@@ -476,6 +476,127 @@ export function registerAdvancedTools(
       const snapshot = await controller.getAccessibilitySnapshot({ interestingOnly });
       saveJsonToFile(snapshot, filePath);
       return { content: [{ type: 'text', text: `Accessibility snapshot saved to ${filePath}` }] };
+    },
+  );
+
+  // ── Batch Form Fill ──
+
+  server.registerTool(
+    'batch_fill_form',
+    {
+      title: 'Batch Fill Form',
+      description:
+        'Fill multiple form fields in a single call. Supports text inputs, checkboxes, radio buttons, select dropdowns, combobox (autocomplete), and range sliders. Use force=true for shadow DOM / custom components.',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        fields: z.array(z.object({
+          selector: z.string().describe('CSS selector of the field'),
+          value: z.string().describe('Value to set. For checkboxes use "true"/"false". For sliders use numeric string.'),
+          type: z.enum(['text', 'checkbox', 'radio', 'select', 'combobox', 'slider']).optional().describe('Field type. Defaults to text.'),
+          force: z.boolean().optional().describe('Use JS injection for shadow DOM. Defaults to false.'),
+        })).describe('Array of fields to fill'),
+      },
+    },
+    async ({ sessionId, fields }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      await controller.batchFill(fields);
+      return { content: [{ type: 'text', text: `Filled ${fields.length} form fields` }] };
+    },
+  );
+
+  // ── Wait for Text Gone ──
+
+  server.registerTool(
+    'wait_for_text_gone',
+    {
+      title: 'Wait for Text to Disappear',
+      description:
+        'Wait until specific text is no longer visible on the page. Useful for waiting for loading spinners, "Please wait..." messages, or progress indicators to vanish.',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        text: z.string().describe('The text to wait for disappearing'),
+        timeout: z.number().optional().describe('Max wait time in ms. Defaults to 30000.'),
+      },
+    },
+    async ({ sessionId, text, timeout }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      await controller.waitForTextGone(text, timeout);
+      return { content: [{ type: 'text', text: `Text "${text}" has disappeared` }] };
+    },
+  );
+
+  // ── Element-Scoped JS ──
+
+  server.registerTool(
+    'evaluate_on_element',
+    {
+      title: 'Evaluate JS on Element',
+      description:
+        'Execute JavaScript scoped to a specific DOM element. The expression receives the element as "el". Example: "(el) => el.textContent" or "(el) => el.getBoundingClientRect()".',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        selector: z.string().describe('CSS selector of the target element'),
+        expression: z.string().describe('JS arrow function receiving the element. E.g., "(el) => el.textContent"'),
+      },
+    },
+    async ({ sessionId, selector, expression }) => {
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      const controller = new PageController(page);
+      const result = await controller.evaluateOnElement(selector, expression);
+      const text = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
+      return { content: [{ type: 'text', text }] };
+    },
+  );
+
+  // ── Wait (Sleep) ──
+
+  server.registerTool(
+    'wait',
+    {
+      title: 'Wait',
+      description: 'Wait for a specified number of milliseconds. Simple time-based delay. Use between actions when you need a pause.',
+      inputSchema: {
+        ms: z.number().describe('Milliseconds to wait'),
+      },
+    },
+    async ({ ms }) => {
+      await wait(ms);
+      return { content: [{ type: 'text', text: `Waited ${ms}ms` }] };
+    },
+  );
+
+  // ── Run Script (Escape Hatch) ──
+
+  server.registerTool(
+    'run_script',
+    {
+      title: 'Run Puppeteer Script',
+      description:
+        'Execute raw Puppeteer code against the browser. The script receives `page` (Puppeteer Page) and `browser` (Puppeteer Browser) as variables. ' +
+        'This is the escape hatch for anything not covered by other tools. Return a value from the script to get it as the result. ' +
+        'Example: "const title = await page.title(); return title;"',
+      inputSchema: {
+        sessionId: z.string().describe('The session ID'),
+        code: z.string().describe('Puppeteer code to execute. Has access to `page` and `browser` variables. Use `return` to return a value.'),
+      },
+    },
+    async ({ sessionId, code }) => {
+      const session = sessionManager.getSession(sessionId);
+      const page = await sessionManager.getOrCreatePage(sessionId);
+      try {
+        const result = await runScript(page, session.browser, code);
+        const text = result === undefined ? 'Script executed (no return value)'
+          : typeof result === 'string' ? result
+          : JSON.stringify(result, null, 2);
+        return { content: [{ type: 'text', text }] };
+      } catch (err: any) {
+        return {
+          content: [{ type: 'text', text: `Script error: ${err?.message ?? String(err)}` }],
+          isError: true,
+        };
+      }
     },
   );
 }

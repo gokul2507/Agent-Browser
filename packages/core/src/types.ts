@@ -136,7 +136,7 @@ export interface ClickOptions {
 export interface BatchFillField {
   selector: string;
   value: string;
-  type?: 'text' | 'checkbox' | 'radio' | 'select';
+  type?: 'text' | 'checkbox' | 'radio' | 'select' | 'combobox' | 'slider';
   force?: boolean;
 }
 

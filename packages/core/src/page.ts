@@ -397,4 +397,10 @@ export class PageController {
   async evaluateOnElement(selector: string, expression: string): Promise<unknown> {
     return advanced.evaluateOnElement(this.page, selector, expression);
   }
+
+  // ── Wait ──
+
+  async wait(ms: number): Promise<void> {
+    return advanced.wait(ms);
+  }
 }

@@ -348,6 +348,14 @@ export async function batchFill(page: Page, fields: BatchFillField[]): Promise<v
         await page.select(selector, value);
         break;
       }
+      case 'combobox': {
+        await fillCombobox(page, selector, value);
+        break;
+      }
+      case 'slider': {
+        await fillSlider(page, selector, value);
+        break;
+      }
       case 'text':
       default: {
         if (force) {
@@ -426,4 +434,92 @@ export function saveToFile(data: string, filePath: string): void {
 
 export function saveJsonToFile(data: unknown, filePath: string): void {
   writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+// ── Wait (Sleep) ──
+
+export async function wait(ms: number): Promise<void> {
+  await new Promise((r) => setTimeout(r, ms));
+}
+
+// ── Run Script (Puppeteer Escape Hatch) ──
+
+/**
+ * Execute raw puppeteer code against the page.
+ * The script receives `page` (Puppeteer Page) and `browser` (Puppeteer Browser) as globals.
+ * This is the escape hatch for anything not covered by other tools.
+ */
+export async function runScript(
+  page: Page,
+  browser: Browser,
+  code: string,
+): Promise<unknown> {
+  const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+  const fn = new AsyncFunction('page', 'browser', code);
+  return fn(page, browser);
+}
+
+// ── Batch Fill: Combobox + Slider Support ──
+
+export async function fillCombobox(page: Page, selector: string, value: string): Promise<void> {
+  // Click to open the combobox
+  await page.click(selector);
+  await new Promise((r) => setTimeout(r, 200));
+
+  // Type to filter options
+  await page.type(selector, value);
+  await new Promise((r) => setTimeout(r, 300));
+
+  // Find and click the matching option
+  const clicked = await page.evaluate((searchValue: string) => {
+    // Search common combobox option patterns
+    const selectors = [
+      '[role="option"]',
+      '[role="listbox"] li',
+      '.select-option',
+      '.dropdown-item',
+      'ul.options li',
+      'datalist option',
+      '[class*="option"]',
+      '[class*="dropdown"] [class*="item"]',
+    ];
+
+    for (const sel of selectors) {
+      for (const el of document.querySelectorAll(sel)) {
+        const text = (el as HTMLElement).textContent?.trim() ?? '';
+        if (text.includes(searchValue)) {
+          (el as HTMLElement).click();
+          return true;
+        }
+      }
+    }
+    return false;
+  }, value);
+
+  if (!clicked) {
+    // Fallback: press Enter to accept the typed value
+    await page.keyboard.press('Enter');
+  }
+}
+
+export async function fillSlider(page: Page, selector: string, value: string): Promise<void> {
+  const numValue = Number(value);
+
+  await page.evaluate(
+    (sel: string, val: number) => {
+      const input = document.querySelector(sel) as HTMLInputElement;
+      if (!input) throw new Error(`Slider not found: ${sel}`);
+
+      // Use native setter to set value
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+      if (setter) setter.call(input, String(val));
+      else input.value = String(val);
+
+      // Dispatch all necessary events
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    },
+    selector,
+    numValue,
+  );
 }
