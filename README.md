@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/github/stars/gokul2507/Agent-Browser)](https://github.com/gokul2507/Agent-Browser)
 
-An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda-io/browser) and Chromium. Enables AI agents to navigate, extract, and interact with the web through **55 MCP tools**, a **REST API**, and **JS/Python SDKs**.
+An AI-agent-friendly browser built on [Lightpanda](https://github.com/lightpanda-io/browser) and Chromium. Enables AI agents to navigate, extract, and interact with the web through **60 MCP tools**, a **REST API**, and **JS/Python SDKs**.
 
 ## Installation
 
@@ -444,6 +444,12 @@ Supported formats: JSON (EditThisCookie, DevTools), Netscape cookie.txt (curl, w
 | `save_console_to_file` | Save captured console messages to JSON file |
 | `save_network_to_file` | Save captured network requests to JSON file |
 | `save_accessibility_to_file` | Save accessibility tree to JSON file |
+| **Escape Hatch** | |
+| `run_script` | Execute raw Puppeteer code — the escape hatch for anything not covered by other tools |
+| `wait` | Simple time-based delay (milliseconds) |
+| `batch_fill_form` | Fill multiple fields at once (text, checkbox, radio, select, combobox, slider) |
+| `wait_for_text_gone` | Wait for text to disappear (loading spinners, progress messages) |
+| `evaluate_on_element` | Execute JS scoped to a specific DOM element |
 
 ### Structured Output Format
 
@@ -584,7 +590,7 @@ ai-browser/
 | Package | Description |
 |---------|-------------|
 | [`@agent_browser/core`](https://www.npmjs.com/package/@agent_browser/core) | Dual browser engine (Lightpanda + Chromium), session management, page control, content extraction, SPA actions, cookie utilities |
-| [`@agent_browser/api`](https://www.npmjs.com/package/@agent_browser/api) | REST API with 45+ endpoints, auth, rate limiting, logging, dashboard |
+| [`@agent_browser/api`](https://www.npmjs.com/package/@agent_browser/api) | REST API with 50+ endpoints, auth, rate limiting, logging, dashboard |
 | [`@agent_browser/mcp-server`](https://www.npmjs.com/package/@agent_browser/mcp-server) | MCP server with 55 tools + embedded dashboard for Claude Code |
 | [`@agent_browser/sdk`](https://www.npmjs.com/package/@agent_browser/sdk) | TypeScript SDK wrapping the REST API |
 | [`ai-browser-sdk`](https://pypi.org/project/ai-browser-sdk/) | Python SDK with async support and Pydantic models |
