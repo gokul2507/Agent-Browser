@@ -60,7 +60,7 @@ export interface SessionManagerConfig {
 }
 
 export const DEFAULT_SESSION_CONFIG: Required<SessionManagerConfig> = {
-  idleTimeoutMs: 5 * 60 * 1000, // 5 minutes
+  idleTimeoutMs: 30 * 60 * 1000, // 30 minutes
   maxSessions: 16,
   defaultEngine: 'lightpanda',
 };

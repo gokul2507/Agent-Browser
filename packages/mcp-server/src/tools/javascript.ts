@@ -11,18 +11,35 @@ export function registerJavascriptTools(
     {
       title: 'Execute JavaScript',
       description:
-        'Execute JavaScript in the browser page context. Supports arrow functions like "() => document.title" or raw expressions like "2 + 2". Returns the result or error.',
+        'Execute JavaScript in the browser page context. Supports arrow functions like "() => document.title" or raw expressions like "2 + 2". Returns the result or error. Accepts `expression`, `script`, or `code` as the parameter name.',
       inputSchema: {
         sessionId: z.string().describe('The session ID'),
         expression: z
           .string()
-          .describe('JavaScript expression to evaluate. E.g., "() => document.title" or "1 + 1"'),
+          .optional()
+          .describe('JavaScript to evaluate. E.g., "() => document.title" or "1 + 1"'),
+        script: z
+          .string()
+          .optional()
+          .describe('Alias for expression'),
+        code: z
+          .string()
+          .optional()
+          .describe('Alias for expression'),
       },
     },
-    async ({ sessionId, expression }) => {
+    async ({ sessionId, expression, script, code }) => {
+      const js = expression ?? script ?? code;
+      if (!js) {
+        return {
+          content: [{ type: 'text', text: 'Error: Provide expression, script, or code parameter' }],
+          isError: true,
+        };
+      }
+
       const page = await sessionManager.getOrCreatePage(sessionId);
       const controller = new PageController(page);
-      const result = await controller.executeJs({ expression });
+      const result = await controller.executeJs({ expression: js });
 
       if (result.error) {
         return {

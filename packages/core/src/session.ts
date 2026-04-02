@@ -1,8 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { Page } from 'puppeteer-core';
 import type { BrowserEngine } from './engine.js';
-import { LightpandaEngine } from './engine-lightpanda.js';
-import { ChromiumEngine } from './engine-chromium.js';
 import { createEngine } from './browser.js';
 import {
   type BrowserConfig,
@@ -137,8 +135,12 @@ export class SessionManager {
   getSession(id: string): Session {
     const session = this.sessions.get(id);
     if (!session) {
-      throw new Error(`Session "${id}" not found`);
+      throw new Error(
+        `Session "${id}" not found. It may have expired due to inactivity ` +
+        `(timeout: ${this.config.idleTimeoutMs / 1000}s). Create a new session with create_session.`
+      );
     }
+    // Auto-extend timeout on every activity
     session.lastActivity = new Date();
     return session;
   }
